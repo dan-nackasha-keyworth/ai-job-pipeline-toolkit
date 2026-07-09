@@ -1,0 +1,7 @@
+# No API keys or secrets are used by this project — this is just standard hygiene.
+.env
+.env.*
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

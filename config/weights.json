@@ -1,0 +1,34 @@
+{
+  "_notes": "Default starting weights, not validated for any individual user. Edit the 'max' values to change scoring emphasis — they should sum to 100. See README.md for guidance before changing these on day one: with no outcome history yet, you have no basis to know your own weighting should differ from the default. Let the recalibration agent (see SKILL.md) suggest changes once you have enough outcome data, rather than guessing upfront.",
+
+  "components": {
+    "jd_fit": {
+      "max": 45,
+      "description": "How precisely the candidate's credentials map to the stated requirements: seniority level, years of experience, specific must-have skills, domain/sector fit."
+    },
+    "seniority": {
+      "max": 15,
+      "description": "Alignment between the candidate's level and the role's level. Asymmetric by design: applying below one's level is rarely penalised; a severe stretch upward is the one scenario that reliably kills callback odds."
+    },
+    "competition": {
+      "max": 20,
+      "description": "Estimated size of the applicant pool, driven primarily by company scale/profile, not role seniority. The component most sensitive to getting company facts right, which is why the live-search verification agent exists."
+    },
+    "comp": {
+      "max": 10,
+      "description": "Alignment against the candidate's stated compensation floor. Unknown comp is never penalised — only a confirmed band below the floor is."
+    },
+    "blockers": {
+      "max": 10,
+      "description": "Right to work, geography, visa, or other confirmed hard requirements the candidate cannot meet."
+    }
+  },
+
+  "recalibration": {
+    "min_logged_outcomes": 20,
+    "min_positive_outcomes": 3,
+    "_notes": "The recalibration agent will not propose any weight change below these thresholds — it will say plainly that there isn't enough data yet. Even at the threshold, treat any suggestion as a weak signal, not a validated finding. These numbers are a deliberately conservative floor, not a target to rush toward."
+  },
+
+  "company_cache_ttl_days": 90
+}
