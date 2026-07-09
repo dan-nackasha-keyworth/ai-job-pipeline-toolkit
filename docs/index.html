@@ -101,8 +101,8 @@
     cursor: pointer;
   }
   .card-head:hover { background: var(--panel-2); }
-  .role { font-weight: 600; }
-  .company { color: var(--text-dim); font-size: 13px; }
+  .company { font-weight: 600; }
+  .role { color: var(--text-dim); font-size: 13px; }
   .badge {
     font-size: 12px;
     padding: 3px 10px;
@@ -963,8 +963,8 @@ function renderCard(app) {
     <div class="card" id="card-${esc(id)}">
       <div class="card-head" onclick="toggleCard('${esc(id)}')">
         <div>
-          <div class="role">${esc(app.role || "Untitled role")}</div>
-          <div class="company">${esc(app.company || "Unknown company")} &middot; applied ${esc(fmtDate(app.date_applied)) || "unknown date"}</div>
+          <div class="company">${esc(app.company || "Unknown company")}</div>
+          <div class="role">${esc(app.role || "Untitled role")} &middot; applied ${esc(fmtDate(app.date_applied)) || "unknown date"}</div>
         </div>
         <div class="badge ${esc(status)}">${esc(status)}</div>
         <div class="score"><div class="v">${Number.isFinite(score.value) ? score.value : "—"}</div><div class="t">${esc(score.tier || "")}</div></div>
@@ -986,8 +986,8 @@ function renderCard(app) {
     <div class="card error-card">
       <div class="card-head">
         <div>
-          <div class="role">Couldn't render this application</div>
-          <div class="company">${esc(app && app.id)} &middot; check this file's format against schema/SCHEMA.md</div>
+          <div class="company">Couldn't render this application</div>
+          <div class="role">${esc(app && app.id)} &middot; check this file's format against schema/SCHEMA.md</div>
         </div>
         <div class="badge error">error</div>
         <div class="score"></div>
