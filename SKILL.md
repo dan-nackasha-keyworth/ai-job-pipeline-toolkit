@@ -1,9 +1,9 @@
 ---
-name: career-pipeline
+name: job-pipeline
 description: Tracks job applications, scores job descriptions for callback likelihood, and maintains a visual pipeline dashboard. Use this skill whenever the user wants to score a job description, log an application, update an application's status or outcome, review their pipeline, or ask for the dashboard to be regenerated. Works entirely on the user's own tracked data — never on data belonging to anyone else.
 ---
 
-# Career Pipeline Toolkit
+# Job Pipeline Toolkit
 
 An open-source job-application tracker and JD-fit scorer. This skill runs entirely inside your own Claude.ai or Cowork session, using your own account. It never contacts anyone on your behalf, never applies to anything, and never sends your data anywhere.
 

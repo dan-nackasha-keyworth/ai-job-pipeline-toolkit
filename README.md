@@ -1,4 +1,4 @@
-# Career Pipeline Toolkit
+# Job Pipeline Toolkit
 
 An open-source job-application tracker and JD-fit scorer, built as a Claude skill. It runs entirely inside your own [Claude.ai](https://claude.ai) Project or [Claude Cowork](https://claude.ai/discover/cowork) session — no separate app, no account with anyone but Anthropic, no data collected by anyone.
 
