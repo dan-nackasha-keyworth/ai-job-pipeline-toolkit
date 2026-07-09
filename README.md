@@ -2,7 +2,7 @@
 
 An open-source job-application tracker and JD-fit scorer, built as a Claude skill. It runs entirely inside your own [Claude.ai](https://claude.ai) Project or [Claude Cowork](https://claude.ai/discover/cowork) session — no separate app, no account with anyone but Anthropic, no data collected by anyone.
 
-**[View the example dashboard →](https://dan-nackasha-keyworth.github.io/ai-job-pipeline-toolkit/)**
+**[View the example dashboard →](https://ddkeyworth.github.io/ai-job-pipeline-toolkit/)**
 
 <p>
   <img src="docs/assets/dashboard-pipeline.png" alt="Pipeline view — a filterable list of tracked applications with company, role, status, and score" width="49%">
