@@ -72,6 +72,8 @@ This agent only ever reads public information about a company. It does not conta
 
 Update the application file per `schema/SCHEMA.md` as things change. When the user confirms they've actually submitted an application for a role already scored under Step 2, move `status` from `scored` to `applied` and set `date_applied` to the real submission date. Once `status` moves to `interviewing` or beyond, add the Briefing pack section. Once an outcome is confirmed, set `score.locked: true` and **never revise a locked score again for any reason** — it's a prediction evaluated by the outcome, not adjusted to match it.
 
+Every time an `interviewing` application is updated, ask whether the next stage has a confirmed date and set `next_interview_date` accordingly — to that date if known, or back to `null` if the last stage just happened and the next one isn't booked yet. This is what the dashboard uses to show what's actually coming up next; a stale date left in the field is worse than no date at all.
+
 ## Step 5: Regenerate the dashboard
 
 Read every application file, build the three-level view (Pipeline → Interview stage → Briefing pack) per the dashboard template, and output/write it. Do this whenever asked, or after logging a new application/outcome if the user seems to be working through their pipeline in one sitting — but don't regenerate proactively on every single small edit if it wasn't asked for; that's unnecessary cost for no benefit.

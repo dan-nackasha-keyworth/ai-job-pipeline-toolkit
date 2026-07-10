@@ -32,6 +32,8 @@ score:
 outcome: null               # null | interview | offer | rejected | withdrawn
 outcome_date: null
 
+next_interview_date: null   # null, or the next confirmed interview date (YYYY-MM-DD)
+
 comp_band: "£140k-160k OTE"  # or null if unknown — absence is never penalised, see SKILL.md
 ---
 
@@ -46,6 +48,8 @@ Anything estimated rather than confirmed (anonymised listing, unclear comp split
 ```
 
 **`status: scored`** is the state every application starts in — a JD has been scored, nothing has been submitted yet. This is deliberately a first-class status, not an afterthought: scoring happens *before* the decision to apply, and a real pipeline includes JDs that were scored and never applied to, not just ones that made the cut. `date_applied` stays `null` for as long as `status` is `scored`. When the user actually submits, update `status` to `applied` and set `date_applied` to the real submission date — `date_scored` never changes.
+
+**`next_interview_date`** only matters once `status` is `interviewing` — it's what lets the dashboard surface "what's coming up" instead of just a flat list. Set it to the next confirmed date whenever one is booked. Once that interview happens, set it back to `null` immediately if the next stage isn't scheduled yet — don't leave a past date sitting in the field. That's what makes a card fall to the back of the active group until a new date is actually known, rather than staying stuck at the top on a stale date.
 
 If `status` is `interviewing` or later, add a **Briefing pack** section to the body:
 

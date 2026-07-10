@@ -21,6 +21,8 @@ score:
 outcome: withdrawn
 outcome_date: 2026-05-11
 
+next_interview_date: null
+
 comp_band: "£95k-105k base (below floor once confirmed)"
 ---
 

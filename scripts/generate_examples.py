@@ -87,6 +87,7 @@ BRIEFING_APPS = [
          company_size="~40 employees", funding="Seed/Series A, privately held", competition_tier="low",
          why="Direct fit on a narrow, specialist product mandate; referral likely helped surface the application quickly.",
          watch="Small team — later interview stages likely to probe hands-on delivery experience, not just strategy.",
+         next_interview_date="2026-06-19",
          stages=["Stage 1 — 2026-05-25 — Recruiter screen — positive, moved forward",
                  "Stage 2 — 2026-06-04 — Hiring manager interview — positive, moved to panel"]),
     dict(date="2026-05-22", company="Pemberton Health Tech", role="VP Product", status="interviewing", outcome="interview",
@@ -95,6 +96,7 @@ BRIEFING_APPS = [
          company_size="~600 employees", funding="Series C", competition_tier="moderate",
          why="Solid domain adjacency; moderate competition given the company's mid-market profile.",
          watch="Comp band still unconfirmed — worth raising directly before a later stage.",
+         next_interview_date=None,
          stages=["Stage 1 — 2026-05-29 — Recruiter screen — positive, moved forward"]),
     dict(date="2026-05-26", company="Briarcliff AI", role="Head of Product", status="interviewing", outcome="interview",
          score=82, tier="Tier 1 — Exceptional callback odds", jd_fit=40, seniority=14, competition=16, comp=8, blockers=10,
@@ -102,6 +104,7 @@ BRIEFING_APPS = [
          company_size="~25 employees", funding="Series A", competition_tier="low",
          why="Small, narrow-mandate startup role; strong overlap with prior product-led growth experience.",
          watch="Fast-moving process — later stages may compress quickly; keep availability flexible.",
+         next_interview_date="2026-06-16",
          stages=["Stage 1 — 2026-06-01 — Founder screen — positive, moved forward",
                  "Stage 2 — 2026-06-08 — Product deep-dive — positive, moved to final round"]),
     dict(date="2026-04-30", company="Wrenfield Software", role="Head of Product", status="offer", outcome="offer",
@@ -110,6 +113,7 @@ BRIEFING_APPS = [
          company_size="~60 employees", funding="Series B", competition_tier="low",
          why="Very close mandate match plus a warm referral; comp confirmed early and above floor.",
          watch="Decision deadline is tight relative to other processes still in flight.",
+         next_interview_date=None,
          stages=["Stage 1 — 2026-05-06 — Recruiter screen — positive, moved forward",
                  "Stage 2 — 2026-05-14 — Hiring manager interview — positive, moved forward",
                  "Stage 3 — 2026-05-21 — Final panel — positive",
@@ -120,6 +124,7 @@ BRIEFING_APPS = [
          company_size="~300 employees", funding="Series C", competition_tier="moderate",
          why="Strong domain fit; moderate competition given company's mid-market scale.",
          watch="Slightly lower comp than Wrenfield — worth comparing full package, not just base, before deciding.",
+         next_interview_date=None,
          stages=["Stage 1 — 2026-05-11 — Recruiter screen — positive, moved forward",
                  "Stage 2 — 2026-05-19 — Hiring manager interview — positive, moved forward",
                  "Stage 3 — 2026-05-28 — Final panel — positive",
@@ -163,6 +168,8 @@ score:
 outcome: {outcome if outcome else "null"}
 outcome_date: {date if outcome else "null"}
 
+next_interview_date: null
+
 comp_band: {comp_band_yaml}
 ---
 
@@ -188,6 +195,7 @@ def write_briefing(app):
     fname = f"{app['date']}-{slug}-{slugify(app['role'])}.md"
     est = json.dumps(app["estimated_fields"])
     comp_band_yaml = f'"{app["comp_band"]}"' if app["comp_band"] else "null"
+    next_interview_yaml = app["next_interview_date"] if app["next_interview_date"] else "null"
     stages_md = "\n".join(f"- {s}" for s in app["stages"])
     fm = f"""---
 company: "{app['company']}"
@@ -211,6 +219,8 @@ score:
 
 outcome: {app['outcome']}
 outcome_date: {app['date']}
+
+next_interview_date: {next_interview_yaml}
 
 comp_band: {comp_band_yaml}
 ---

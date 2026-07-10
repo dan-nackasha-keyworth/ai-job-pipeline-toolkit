@@ -21,6 +21,8 @@ score:
 outcome: interview
 outcome_date: 2026-05-18
 
+next_interview_date: 2026-06-19
+
 comp_band: "£125k-140k OTE"
 ---
 

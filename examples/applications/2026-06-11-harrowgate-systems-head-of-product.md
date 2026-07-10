@@ -21,6 +21,8 @@ score:
 outcome: null
 outcome_date: null
 
+next_interview_date: null
+
 comp_band: "£115k-128k OTE"
 ---
 

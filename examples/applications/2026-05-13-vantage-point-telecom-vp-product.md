@@ -21,6 +21,8 @@ score:
 outcome: rejected
 outcome_date: 2026-05-13
 
+next_interview_date: null
+
 comp_band: null
 ---
 

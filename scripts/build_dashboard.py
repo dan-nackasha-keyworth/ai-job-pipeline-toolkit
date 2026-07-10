@@ -76,6 +76,8 @@ def parse_application(path):
         "status": fm["status"],
         "score": fm["score"],
         "outcome": fm.get("outcome"),
+        "outcome_date": date_str(fm.get("outcome_date")),
+        "next_interview_date": date_str(fm.get("next_interview_date")),
         "comp_band": fm.get("comp_band"),
         "jd_summary": jd_summary,
         "caveats": caveats,

@@ -21,6 +21,8 @@ score:
 outcome: rejected
 outcome_date: 2026-04-11
 
+next_interview_date: null
+
 comp_band: "£115k-130k OTE"
 ---
 

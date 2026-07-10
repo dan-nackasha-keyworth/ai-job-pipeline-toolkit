@@ -21,6 +21,8 @@ score:
 outcome: offer
 outcome_date: 2026-05-04
 
+next_interview_date: null
+
 comp_band: "£122k-135k OTE, confirmed above floor"
 ---
 

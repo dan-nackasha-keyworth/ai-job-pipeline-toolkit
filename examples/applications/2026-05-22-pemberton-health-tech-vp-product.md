@@ -21,6 +21,8 @@ score:
 outcome: interview
 outcome_date: 2026-05-22
 
+next_interview_date: null
+
 comp_band: null
 ---
 

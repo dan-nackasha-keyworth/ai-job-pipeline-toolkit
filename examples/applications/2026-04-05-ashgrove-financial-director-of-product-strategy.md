@@ -21,6 +21,8 @@ score:
 outcome: rejected
 outcome_date: 2026-04-05
 
+next_interview_date: null
+
 comp_band: "£100k-115k base"
 ---
 
