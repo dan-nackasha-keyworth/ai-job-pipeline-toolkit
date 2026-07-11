@@ -43,6 +43,35 @@
     font-size: 13px;
     color: var(--text-dim);
   }
+  .headline-stats {
+    max-width: 1100px;
+    margin: 0 auto 14px;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .headline-stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .headline-stat.total { border-color: var(--accent); }
+  .headline-stat.interviewed { border-color: var(--good); }
+  .headline-stat.rejected { border-color: var(--bad); }
+  .headline-stat .n { font-size: 32px; font-weight: 700; line-height: 1; }
+  .headline-stat.total .n { color: var(--accent); }
+  .headline-stat.interviewed .n { color: var(--good); }
+  .headline-stat.rejected .n { color: var(--bad); }
+  .headline-stat .l { font-size: 12.5px; color: var(--text-dim); margin-top: 6px; }
+  .headline-stat .sub { font-size: 11px; color: var(--text-dim); opacity: .75; margin-top: 2px; }
+  .flow-toggle-wrap { max-width: 1100px; margin: 0 auto 12px; padding: 0 24px; }
+  .flow-toggle-wrap .briefing-toggle { margin-top: 0; }
+  .status-flow { display: none; max-width: 1100px; margin: 0 auto 16px; padding: 16px 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; flex-direction: column; gap: 10px; }
+  .status-flow.open { display: flex; }
+  .flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .flow-arrow { color: var(--text-dim); font-size: 14px; }
   .stats {
     max-width: 1100px;
     margin: 0 auto 20px;
@@ -131,15 +160,13 @@
   }
   .badge.scored { background: #2f2a42; color: #b39bf5; }
   .badge.applied { background: #2a3542; color: #8fb4e3; }
-  .badge.awaiting_recruiter { background: #2a3542; color: #8fb4e3; }
   .badge.interviewing { background: #2a3f33; color: var(--good); }
   .badge.offer { background: #3a3323; color: var(--warn); }
+  .badge.didnt_apply { background: #2b2b2b; color: var(--neutral); }
   .badge.rejected { background: #3a2727; color: var(--bad); }
   .badge.rejected_after_interview { background: #3a2727; color: var(--bad); }
-  .badge.withdrawn { background: #2b2b2b; color: var(--neutral); }
-  .badge.withdrawn_after_interview { background: #2b2b2b; color: var(--neutral); }
+  .badge.withdrew_after_interview { background: #2b2b2b; color: var(--neutral); }
   .badge.assumed_rejected { background: #2b2b2b; color: var(--neutral); border: 1px dashed var(--neutral); }
-  .badge.role_closed { background: #2b2b2b; color: var(--neutral); }
   .badge.error { background: #4a2e1f; color: #e0954f; }
   .card.error-card { border-color: #6b4423; }
   .score { text-align: right; }
@@ -207,6 +234,34 @@
 <div class="banner">
   This page shows entirely fictional companies and applications, generated to demonstrate the tool. No real job search data of any kind. See <code>README.md</code> for how to replace this with your own tracking.
 </div>
+
+<div class="flow-toggle-wrap">
+  <button class="briefing-toggle" onclick="document.getElementById('status-flow').classList.toggle('open')">Show status flow</button>
+</div>
+<div class="status-flow" id="status-flow">
+  <div class="flow-row">
+    <span class="badge scored">Scored</span>
+    <span class="flow-arrow">&#8594;</span>
+    <span class="badge applied">Applied</span>
+    <span class="badge didnt_apply">Didn't apply</span>
+  </div>
+  <div class="flow-row">
+    <span class="badge applied">Applied</span>
+    <span class="flow-arrow">&#8594;</span>
+    <span class="badge rejected">Rejected</span>
+    <span class="badge assumed_rejected">Assumed rejected</span>
+    <span class="badge interviewing">Interviewing</span>
+  </div>
+  <div class="flow-row">
+    <span class="badge interviewing">Interviewing</span>
+    <span class="flow-arrow">&#8594;</span>
+    <span class="badge offer">Offer</span>
+    <span class="badge rejected_after_interview">Rejected post-interview</span>
+    <span class="badge withdrew_after_interview">Withdrew post-interview</span>
+  </div>
+</div>
+
+<div class="headline-stats" id="headline-stats"></div>
 
 <div class="stats" id="stats"></div>
 
@@ -720,25 +775,25 @@ const APPLICATIONS = /*__DATA__*/[
     "company": "Redshank Payments",
     "role": "Director of Product",
     "date_scored": "2026-05-11",
-    "date_applied": "2026-05-11",
-    "status": "withdrawn",
+    "date_applied": null,
+    "status": "didnt_apply",
     "status_date": "2026-05-11",
     "score": {
-      "value": 69,
-      "tier": "Tier 3 — Solid, worth applying",
+      "value": 71,
+      "tier": "Tier 2 — Strong callback odds",
       "locked": true,
       "breakdown": {
         "jd_fit": 36,
         "seniority": 12,
         "competition": 11,
-        "comp": 10,
+        "comp": 2,
         "blockers": 10
       },
       "estimated_fields": []
     },
     "next_interview_date": null,
-    "comp_band": "£95k-105k base (below floor once confirmed)",
-    "jd_summary": "Director of Product at Redshank Payments. Withdrew after confirmed comp band came in below floor.",
+    "comp_band": "£95k-105k base, confirmed below floor",
+    "jd_summary": "Director of Product at Redshank Payments. Scored well on fit, but the comp band came back confirmed below floor before applying — decided not to submit rather than pursue a role that couldn't clear the floor regardless of interview performance.",
     "caveats": "No estimated fields; all components scored against confirmed information.",
     "briefing": null
   },
@@ -992,7 +1047,7 @@ const APPLICATIONS = /*__DATA__*/[
     "role": "VP Product",
     "date_scored": "2026-05-19",
     "date_applied": "2026-05-19",
-    "status": "withdrawn_after_interview",
+    "status": "withdrew_after_interview",
     "status_date": "2026-06-10",
     "score": {
       "value": 71,
@@ -1331,33 +1386,6 @@ const APPLICATIONS = /*__DATA__*/[
     "briefing": null
   },
   {
-    "id": "2026-06-01-pinehollow-systems-head-of-product",
-    "company": "Pinehollow Systems",
-    "role": "Head of Product",
-    "date_scored": "2026-06-01",
-    "date_applied": "2026-06-01",
-    "status": "role_closed",
-    "status_date": "2026-06-01",
-    "score": {
-      "value": 71,
-      "tier": "Tier 2 — Strong callback odds",
-      "locked": true,
-      "breakdown": {
-        "jd_fit": 37,
-        "seniority": 13,
-        "competition": 13,
-        "comp": 8,
-        "blockers": 10
-      },
-      "estimated_fields": []
-    },
-    "next_interview_date": null,
-    "comp_band": "£110k-125k OTE",
-    "jd_summary": "Head of Product at Pinehollow Systems. Listing disappeared from the careers page three weeks after applying, no response received — the recruiter later confirmed the role was pulled internally, not filled. Not a judgement on the application.",
-    "caveats": "No estimated fields; all components scored against confirmed information.",
-    "briefing": null
-  },
-  {
     "id": "2026-06-02-fernbank-analytics-head-of-product",
     "company": "Fernbank Analytics",
     "role": "Head of Product",
@@ -1439,33 +1467,6 @@ const APPLICATIONS = /*__DATA__*/[
     "comp_band": null,
     "jd_summary": "VP Product at Union Freight Group. Large logistics incumbent, broad VP-level role draws a wide pool.",
     "caveats": "Competition and/or comp estimated — see estimated_fields above.",
-    "briefing": null
-  },
-  {
-    "id": "2026-06-10-cross-timber-logistics-vp-product",
-    "company": "Cross Timber Logistics",
-    "role": "VP Product",
-    "date_scored": "2026-06-10",
-    "date_applied": "2026-06-10",
-    "status": "awaiting_recruiter",
-    "status_date": "2026-06-10",
-    "score": {
-      "value": 67,
-      "tier": "Tier 3 — Solid, worth applying",
-      "locked": false,
-      "breakdown": {
-        "jd_fit": 35,
-        "seniority": 12,
-        "competition": 10,
-        "comp": 10,
-        "blockers": 10
-      },
-      "estimated_fields": []
-    },
-    "next_interview_date": null,
-    "comp_band": null,
-    "jd_summary": "VP Product at Cross Timber Logistics. Applied and had a positive informal chat with the hiring manager, but the process is paused pending a right-to-work eligibility check on the recruiter's side before it can formally proceed.",
-    "caveats": "No estimated fields; all components scored against confirmed information.",
     "briefing": null
   },
   {
@@ -1554,25 +1555,29 @@ const APPLICATIONS = /*__DATA__*/[
 ]/*__END_DATA__*/;
 
 const STATUS_ORDER = [
-  "scored", "applied", "awaiting_recruiter", "interviewing", "offer",
-  "rejected", "rejected_after_interview", "withdrawn", "withdrawn_after_interview",
-  "assumed_rejected", "role_closed"
+  "scored", "applied", "interviewing", "offer",
+  "didnt_apply", "rejected", "rejected_after_interview",
+  "withdrew_after_interview", "assumed_rejected"
 ];
 
 const STATUS_LABELS = {
   scored: "Scored",
   applied: "Applied",
-  awaiting_recruiter: "Awaiting recruiter",
   interviewing: "Interviewing",
   offer: "Offer",
+  didnt_apply: "Didn't apply",
   rejected: "Rejected",
-  rejected_after_interview: "Rejected (post-interview)",
-  withdrawn: "Withdrawn",
-  withdrawn_after_interview: "Withdrawn (post-interview)",
+  rejected_after_interview: "Rejected post-interview",
+  withdrew_after_interview: "Withdrew post-interview",
   assumed_rejected: "Assumed rejected",
-  role_closed: "Role closed",
 };
 const statusLabel = s => STATUS_LABELS[s] || s;
+
+// Mirrors scripts/_status.py's REACHED_INTERVIEW / NO_INTERVIEW_NEGATIVE —
+// scripts/verify_consistency.py checks these two arrays stay in sync with
+// the Python sets, same drift protection as STATUS_ORDER already has.
+const REACHED_INTERVIEW = ["interviewing", "offer", "rejected_after_interview", "withdrew_after_interview"];
+const NO_INTERVIEW_NEGATIVE = ["rejected", "assumed_rejected"];
 
 function fmtDate(d) {
   if (!d) return "";
@@ -1580,24 +1585,38 @@ function fmtDate(d) {
   return dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function renderStats() {
+// Total Tracked / Interviewed / Rejected are the three numbers worth
+// seeing at a glance — kept visually separate from the granular
+// per-status breakdown below, not just another tile in that grid.
+function renderHeadlineStats() {
   const data = Array.isArray(APPLICATIONS) ? APPLICATIONS.filter(Boolean) : [];
   const total = data.length;
+  const interviewed = data.filter(a => REACHED_INTERVIEW.includes(a.status)).length;
+  const rejected = data.filter(a => NO_INTERVIEW_NEGATIVE.includes(a.status)).length;
+  const headline = [
+    { cls: "total", l: "Total tracked", n: total },
+    { cls: "interviewed", l: "Interviewed", sub: "reached interview stage, any outcome", n: interviewed },
+    { cls: "rejected", l: "Rejected", sub: "no interview reached", n: rejected },
+  ];
+  document.getElementById("headline-stats").innerHTML = headline.map(s =>
+    `<div class="headline-stat ${s.cls}"><div class="n">${s.n}</div><div class="l">${esc(s.l)}</div>${s.sub ? `<div class="sub">${esc(s.sub)}</div>` : ""}</div>`
+  ).join("");
+}
+
+function renderStats() {
+  const data = Array.isArray(APPLICATIONS) ? APPLICATIONS.filter(Boolean) : [];
   const byStatus = {};
   data.forEach(a => byStatus[a.status] = (byStatus[a.status] || 0) + 1);
   const stats = [
-    { l: "Total tracked", n: total },
     { l: "Scored, not applied", n: byStatus.scored || 0 },
     { l: "Applied", n: byStatus.applied || 0 },
-    { l: "Awaiting recruiter", n: byStatus.awaiting_recruiter || 0 },
     { l: "Interviewing", n: byStatus.interviewing || 0 },
     { l: "Offers", n: byStatus.offer || 0 },
+    { l: "Didn't apply", n: byStatus.didnt_apply || 0 },
     { l: "Rejected", n: byStatus.rejected || 0 },
-    { l: "Rejected (post-interview)", n: byStatus.rejected_after_interview || 0 },
+    { l: "Rejected post-interview", n: byStatus.rejected_after_interview || 0 },
     { l: "Assumed rejected", n: byStatus.assumed_rejected || 0 },
-    { l: "Withdrawn", n: byStatus.withdrawn || 0 },
-    { l: "Withdrawn (post-interview)", n: byStatus.withdrawn_after_interview || 0 },
-    { l: "Role closed", n: byStatus.role_closed || 0 },
+    { l: "Withdrew post-interview", n: byStatus.withdrew_after_interview || 0 },
   ];
   document.getElementById("stats").innerHTML = stats.map(s =>
     `<div class="stat"><div class="n">${s.n}</div><div class="l">${s.l}</div></div>`
@@ -1774,8 +1793,8 @@ function toggleBriefing(ev, id) {
 }
 
 const CLOSED_STATUSES = [
-  "rejected", "rejected_after_interview", "withdrawn",
-  "withdrawn_after_interview", "assumed_rejected", "role_closed"
+  "didnt_apply", "rejected", "rejected_after_interview",
+  "withdrew_after_interview", "assumed_rejected"
 ];
 const activityDate = a => a.date_applied || a.date_scored || null;
 const closedDate = a => a.status_date || activityDate(a);
@@ -1808,6 +1827,7 @@ function sortByRecent(list) {
 let currentSort = "prep";
 
 function render() {
+  renderHeadlineStats();
   renderStats();
   renderFilters();
   const data = (Array.isArray(APPLICATIONS) ? APPLICATIONS : []).filter(Boolean);

@@ -17,11 +17,29 @@ The example above is entirely synthetic — fictional companies, fictional appli
 
 - `SKILL.md` — a Claude skill that scores job descriptions for callback likelihood, tracks applications, and generates a dashboard.
 - A simple, documented file format for your applications (`schema/SCHEMA.md`) — one plain-text file per application, no database.
-- A static HTML dashboard (`docs/index.html`) that reads that data and shows a three-level view: your pipeline → interview stage detail → a full "briefing pack" per interview. Default sort is prep-priority — active applications first, soonest known interview date on top, closed ones always last — with a switch to sort by score instead.
-- An eleven-value status vocabulary (see `schema/SCHEMA.md`) that distinguishes rejection/withdrawal before vs. after reaching interview stage, plus silence-inferred rejection, recruiter-side gates, and externally closed roles — because reaching interview stage validates the scoring rubric's prediction regardless of what happens afterward, and a flat "rejected" throws that signal away.
+- A static HTML dashboard (`docs/index.html`) that reads that data and shows a three-level view: your pipeline → interview stage detail → a full "briefing pack" per interview. Default sort is prep-priority — active applications first, soonest known interview date on top, closed ones always last — with a switch to sort by score instead. Three headline numbers (Total tracked, Interviewed, Rejected) sit apart from the granular per-status breakdown, so the one number that actually answers "is this working" isn't buried in a row of nine tiles.
+- A small, exhaustive status vocabulary (see `schema/SCHEMA.md`) that distinguishes rejection after reaching interview stage from rejection before it, plus silence-inferred rejection and a deliberate decision not to apply — because reaching interview stage validates the scoring rubric's prediction regardless of what happens afterward, and a flat "rejected" throws that signal away.
 - Briefing packs are standard-depth by default once an application reaches interview stage — company facts, comp, unique selling points, named-interviewer profiles, prep questions, questions to ask, watch-outs, and a freeform notes catch-all, all generated from your own CV/cover letters, not generic advice. Genuine gaps say `Currently unknown` plus a specific ask, rather than being invented or omitted — a living document filled in over conversation, not a one-shot output.
 
 There is no backend, no server, and nothing to install beyond a text editor. The "AI" parts — scoring, live company research, dashboard generation — run as part of your normal Claude conversation, using your own Claude usage.
+
+### The status flow
+
+```mermaid
+flowchart LR
+    scored(scored) -->|submit| applied(applied)
+    scored -->|decide not to| didnt_apply("didn't apply")
+
+    applied -->|no| rejected(rejected)
+    applied -->|silence| assumed_rejected("assumed rejected")
+    applied -->|progress| interviewing(interviewing)
+
+    interviewing -->|success| offer(offer)
+    interviewing -->|no| rejected_ai("rejected<br/>post-interview")
+    interviewing -->|pull out| withdrew_ai("withdrew<br/>post-interview")
+```
+
+Every status is reached from exactly one place — no other transitions exist. The pre/post-interview split on the two rejection paths is deliberate: reaching `interviewing` validates the scoring rubric's prediction regardless of what happens next, so the dashboard and the recalibration agent both treat `rejected post-interview` as a different signal from a flat `rejected`, not the same outcome with extra detail.
 
 ## Getting started
 

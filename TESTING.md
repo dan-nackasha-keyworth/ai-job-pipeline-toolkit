@@ -1,6 +1,6 @@
 # Testing log
 
-This repo's skill logic was actually executed, not just written and left unverified. Six tests, run across sessions between 2026-07-09 and 2026-07-11, documented here as evidence rather than assertion.
+This repo's skill logic was actually executed, not just written and left unverified. Eight tests, run across sessions between 2026-07-09 and 2026-07-11, documented here as evidence rather than assertion.
 
 **Note on scope:** the two tests below that use a real company ([REDACTED-COMPANY]) are validation exercises only — no application was submitted, no contact was made with anyone, and [REDACTED-COMPANY]'s real data is never written into `examples/`, which stays 100% fictional as documented in the README. This log is the one place in the repo where a real, well-known public company is named, specifically to prove the tool's mechanisms work on real inputs, not just synthetic ones designed to make it look good.
 
@@ -99,6 +99,54 @@ blockers      10.0            9.6             +0.4
 Positive outcomes rose from 5 to 7 — Fenwick and Silverlake now correctly count as positive signal (they validated the scoring rubric's prediction by reaching interview) rather than being indistinguishable from a flat rejection, which is the entire point of this change. Confirmed `score.locked` derives correctly for every status via `scripts/_status.py`'s `should_lock()`: `true` for all six closed statuses and for `offer` (terminal for locking purposes even though it stays in the dashboard's active group for sorting), `false` for `scored`/`applied`/`awaiting_recruiter`/`interviewing`. Also ran `scripts/verify_consistency.py`'s second check — confirmed `docs/index.html`'s JS `STATUS_ORDER` array matches `scripts/_status.py`'s `ALL_STATUSES` exactly, closing the same class of Python/JS drift risk the SCHEMA.md check closes for docs/parser drift.
 
 Confirmed in the live dashboard: `rejected_after_interview` and `withdrawn_after_interview` sort into the closed group (bottom, regardless of date) alongside the other four closed statuses, with distinct badge labels ("Rejected (post-interview)", "Withdrawn (post-interview)") and an expanded stats bar showing the pre/post split explicitly rather than burying it behind filter pills — that split is the actual signal this change exists to surface.
+
+## Test 7 — Status vocabulary simplified to nine values
+
+Real-world review of Test 6's eleven-status design found two problems: `awaiting_recruiter` and `role_closed` were messy to track in practice and added states without adding useful signal, and the model didn't have a clean home for "scored a JD, then deliberately decided not to apply" — that case was left implicitly indistinguishable from "still deciding," sitting at `status: scored` forever either way.
+
+Fixed by removing both unused statuses and adding `didnt_apply` as a genuine sibling to `applied` (both reachable only from `scored`), and folding "withdrew after applying but before interviewing" into plain `rejected` rather than giving it a dedicated status — rare enough, and ambiguous enough for the recalibration signal, that it wasn't earning its own state. The state machine is now fully exhaustive and small:
+
+```
+scored       -> applied | didnt_apply
+applied      -> rejected | assumed_rejected | interviewing
+interviewing -> offer | rejected_after_interview | withdrew_after_interview
+```
+
+Also renamed `withdrawn`/`withdrawn_after_interview` to `withdrew`/`withdrew_after_interview` (simple past tense, matching `rejected`), and removed the parenthetical from both post-interview badge labels ("Rejected (post-interview)" → "Rejected post-interview", same for withdrew).
+
+Repurposed the existing Redshank Payments example (previously a pre-interview `withdrawn` case) into a `didnt_apply` case instead — comp confirmed below floor before ever submitting, comp component correctly scored 2/10 to match (it had incorrectly scored 10/10 in the original, a real scoring-logic bug this rewrite also fixed: "confirmed below floor" should never score near-full marks on comp). Removed the two examples that existed solely to demonstrate the now-dropped statuses (Cross Timber Logistics, Pinehollow Systems) rather than force-fitting them elsewhere.
+
+Ran the full verification suite against the simplified 32-application set (down from 34):
+
+```
+$ python scripts/verify_consistency.py
+SCHEMA.md's Briefing pack example round-trips correctly through the parser (10 sections checked).
+docs/index.html's STATUS_ORDER matches scripts/_status.py's ALL_STATUSES (9 statuses).
+
+$ python scripts/verify_recalibration.py
+Total applications: 32
+Logged outcomes: 24 (threshold: 20)  → gate PASSES
+Positive outcomes: 7 (threshold: 3)  → gate PASSES
+```
+
+Confirmed live in the dashboard: Redshank Payments shows `scored 11 May 2026` (not `applied`, since `date_applied` is correctly `null`) with a "Didn't apply" badge; `score.locked` is `true` for it despite never having been applied to, since a deliberate decision is still a closed, final state. All nine statuses are exercised somewhere in the example set. Stats bar shows all nine buckets with bracket-free labels.
+
+## Test 8 — Headline stats and status-flow legend
+
+Split three headline numbers (Total tracked, Interviewed, Rejected) out of the per-status breakdown grid, styled distinctly (32px colored figures vs. 22px neutral tiles) so the one question that actually matters — "is this working" — isn't buried in nine equally-weighted tiles. "Interviewed" and "Rejected" reuse the exact `REACHED_INTERVIEW`/`NO_INTERVIEW_NEGATIVE` sets the recalibration agent already uses (`scripts/_status.py`), so the headline numbers and the recalibration signal can never silently disagree about what counts as which. Extended `scripts/verify_consistency.py` with a third check confirming the JS mirrors of those two sets match Python exactly — same drift protection already in place for `STATUS_ORDER`.
+
+Also added a collapsible status-flow legend to the dashboard (collapsed by default) and a Mermaid flowchart to the README, both showing the exact nine-status state machine. The dashboard legend reuses the existing `.badge` classes rather than introducing new colors, so it can't visually drift from what the actual application cards show.
+
+Ran live:
+
+```
+$ python scripts/verify_consistency.py
+SCHEMA.md's Briefing pack example round-trips correctly through the parser (10 sections checked).
+docs/index.html's STATUS_ORDER matches scripts/_status.py's ALL_STATUSES (9 statuses).
+docs/index.html's REACHED_INTERVIEW and NO_INTERVIEW_NEGATIVE match scripts/_status.py.
+```
+
+Confirmed in the browser via DOM inspection (screenshots weren't rendering this session): headline stats read Total tracked 32, Interviewed 7, Rejected 17 — the interviewed count matches Test 7's recalibration "positive outcomes" figure exactly, as it should since both derive from the same set. "Total tracked" no longer appears in the per-status grid. Clicked the flow-legend toggle and confirmed all three rows render with the correct transitions and badge colors (scored=purple, applied/interviewing=blue/green, rejected variants=red, didnt_apply/assumed_rejected/withdrew=grey, offer=gold).
 
 ## How to reproduce this
 

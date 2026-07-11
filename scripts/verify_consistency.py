@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Two consistency checks that nothing else in CI catches:
+Consistency checks that nothing else in CI catches:
 
 1. SCHEMA.md's own documented Briefing pack example is round-tripped through
    the real parser (scripts/build_dashboard.py's extract_bp_section() and
@@ -15,6 +15,12 @@ Two consistency checks that nothing else in CI catches:
    status vocabulary have no shared import (one's a script, one's browser
    JS), so nothing else would catch them drifting apart.
 
+3. docs/index.html's JS REACHED_INTERVIEW / NO_INTERVIEW_NEGATIVE arrays
+   (used by the dashboard's headline "Interviewed"/"Rejected" counts) are
+   compared against scripts/_status.py's sets of the same name — same drift
+   risk as (2), for the headline stats added alongside the status vocabulary
+   simplification.
+
 Run from the repo root: python scripts/verify_consistency.py
 Exits 1 on any mismatch.
 """
@@ -23,7 +29,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _status import ALL_STATUSES
+from _status import ALL_STATUSES, REACHED_INTERVIEW, NO_INTERVIEW_NEGATIVE
 from build_dashboard import (
     extract_bp_section,
     parse_bullet_pairs,
@@ -96,8 +102,29 @@ def check_status_order():
     return True
 
 
+def check_recalibration_sets():
+    html = open(DASHBOARD_PATH, encoding="utf-8").read()
+    ok = True
+    for js_name, py_set in (("REACHED_INTERVIEW", REACHED_INTERVIEW), ("NO_INTERVIEW_NEGATIVE", NO_INTERVIEW_NEGATIVE)):
+        m = re.search(rf"const {js_name}\s*=\s*\[(.*?)\];", html, re.DOTALL)
+        if not m:
+            print(f"FAIL: could not find {js_name} in docs/index.html.")
+            ok = False
+            continue
+        js_set = set(re.findall(r'"([a-z_]+)"', m.group(1)))
+        if js_set != py_set:
+            print(f"FAIL: docs/index.html's {js_name} doesn't match scripts/_status.py's {js_name}.")
+            print(f"  docs/index.html: {sorted(js_set)}")
+            print(f"  _status.py:      {sorted(py_set)}")
+            ok = False
+
+    if ok:
+        print("docs/index.html's REACHED_INTERVIEW and NO_INTERVIEW_NEGATIVE match scripts/_status.py.")
+    return ok
+
+
 def main():
-    ok = check_schema_docs() and check_status_order()
+    ok = check_schema_docs() and check_status_order() and check_recalibration_sets()
     if not ok:
         sys.exit(1)
 
