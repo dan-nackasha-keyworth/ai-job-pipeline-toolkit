@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Job Pipeline Toolkit — example dashboard</title>
+<title>Job Pipeline Toolkit – example dashboard</title>
 <style>
   :root {
     --bg: #0b0d10;
@@ -81,8 +81,14 @@
     margin: 0 auto 20px;
     padding: 0 24px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .stats { grid-template-columns: repeat(1, 1fr); }
   }
   .stat {
     background: var(--panel);
@@ -238,11 +244,11 @@
 
 <header>
   <h1>Job Pipeline Toolkit</h1>
-  <p>Example dashboard — generated from synthetic data. See README to point this at your own tracked applications.</p>
+  <p>Example dashboard – generated from synthetic data. See README to point this at your own tracked applications.</p>
 </header>
 
 <div class="banner">
-  This page shows entirely fictional companies and applications, generated to demonstrate the tool. No real job search data of any kind. See <code>README.md</code> for how to replace this with your own tracking.
+  Fictional companies and applications, built to demonstrate the tool. No real job search data. See <code>README.md</code> to use your own.
 </div>
 
 <div class="flow-toggle-wrap">
@@ -280,8 +286,8 @@
 <div class="sort-row">
   <label for="sort-select">Sort</label>
   <select id="sort-select">
-    <option value="prep">Prep priority — soonest interview first</option>
-    <option value="score">Score — highest first</option>
+    <option value="prep">Prep priority – soonest interview first</option>
+    <option value="score">Score – highest first</option>
     <option value="recent">Most recent activity</option>
   </select>
 </div>
@@ -289,7 +295,7 @@
 <main id="cards"></main>
 
 <footer>
-  Job Pipeline Toolkit — open source, MIT licensed, no data collection, no support offered. See the repo <a href="../">README</a> for setup.
+  Job Pipeline Toolkit – open source, MIT licensed, no data collection, no support offered. See the repo <a href="../">README</a> for setup.
 </footer>
 
 <script>
@@ -1650,7 +1656,7 @@ function renderStats() {
   const byStatus = {};
   data.forEach(a => byStatus[a.status] = (byStatus[a.status] || 0) + 1);
   const stats = [
-    { l: "Scored, not applied", n: byStatus.scored || 0 },
+    { l: "Scored, pending", n: byStatus.scored || 0 },
     { l: "Didn't apply", n: byStatus.didnt_apply || 0 },
     { l: "Applied", n: byStatus.applied || 0 },
     { l: "Rejected", n: byStatus.rejected || 0 },
@@ -1746,7 +1752,7 @@ function renderTable(table) {
   const head = `<tr>${table.headers.map(h => `<th>${esc(h)}</th>`).join("")}</tr>`;
   const body = table.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("");
   return `<div class="region-table-wrap"><table class="region-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>
-    <div class="region-caveat">General cultural/business-norm patterns, not verified facts — a starting point, not gospel.</div>`;
+    <div class="region-caveat">General cultural/business-norm patterns, not verified facts – a starting point, not gospel.</div>`;
 }
 
 // Malformed application data (a bad hand-edit, a missing field) should never
@@ -1807,7 +1813,7 @@ function renderCard(app) {
           <div class="role">${esc(app.role || "Untitled role")} &middot; ${app.date_applied ? `applied ${esc(fmtDate(app.date_applied))}` : `scored ${esc(fmtDate(app.date_scored)) || "unknown date"}`}${app.next_interview_date ? ` &middot; <span class="next-interview">next interview ${esc(fmtDate(app.next_interview_date))}</span>` : ""}</div>
         </div>
         <div class="badge ${esc(status)}">${esc(statusLabel(status))}</div>
-        <div class="score"><div class="v">${Number.isFinite(score.value) ? score.value : "—"}</div><div class="t">${esc(score.tier || "")}</div></div>
+        <div class="score"><div class="v">${Number.isFinite(score.value) ? score.value : "–"}</div><div class="t">${esc(score.tier || "")}</div></div>
         <div class="chevron">&#9656;</div>
       </div>
       <div class="card-body">
