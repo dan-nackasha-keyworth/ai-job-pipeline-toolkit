@@ -31,7 +31,12 @@ If you're not sure which context you're in, ask once rather than guessing.
 
 ## Step 1: Find the CV baseline
 
-Locate the user's current CV/resume among their files (Project knowledge or local folder). If more than one candidate file exists, use the most recently modified one and say which you used. If none exists, ask for it – do not score anything without it.
+Locate the user's current CV/resume among their files (Project knowledge or local folder). Treat it as a single, evolving baseline, not a series of dated snapshots.
+
+- **First time:** if none exists, ask for it – do not score anything without it.
+- **More than one candidate file exists:** don't guess from filename or modified date alone – ask which one is current, and suggest the user keep exactly one live CV file going forward (any name) so this never comes up again.
+- **Updating it:** when the user provides a new version – a fresh upload, a pasted revision, an edited file – confirm plainly which file you're now treating as the baseline and that it replaces the old one for all scoring from that point forward. Don't silently start using a new file without saying so.
+- **Effect on past scores:** a CV update only changes scoring done from that point on. Never re-score an already-scored application against the new baseline unless the user explicitly asks – and never touch a `score.locked: true` application under any circumstance, per Step 4.
 
 ## Step 2: Score a job description (100 points)
 

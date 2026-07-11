@@ -44,21 +44,30 @@ Every status is reached from exactly one place – no other transitions exist. T
 ## Getting started
 
 ### Option A – Claude.ai Project
+No git or terminal needed – this is entirely mouse-and-Explorer/Finder work.
+
 1. Create a Claude.ai Project.
-2. Upload `SKILL.md` as a custom skill (Settings → Capabilities → Skills → Add).
-3. Upload your CV and start adding applications as Project files, following `schema/SCHEMA.md`.
-4. Ask Claude to score a JD, log an application, or regenerate your dashboard.
-5. When you want to see the dashboard, ask Claude to produce it as an Artifact.
+2. In Settings → Capabilities, make sure **Code execution and file creation** is turned on – skills won't work without it (Claude.ai says so directly on that toggle).
+3. On this repo's GitHub page, click the green **Code** button → **Download ZIP**, then unzip it (Windows: right-click the downloaded file → **Extract All**. Mac: double-click it).
+4. Rename the extracted folder to `job-pipeline`. Claude.ai's skill packaging requires the ZIP's single top-level folder to match the skill's name – the folder GitHub gives you (something like `ai-job-pipeline-toolkit-main`) won't match, so this step is required, not cosmetic.
+5. Re-compress that renamed folder (Windows: right-click it → **Send to** → **Compressed (zipped) folder**. Mac: right-click it → **Compress**). You should now have `job-pipeline.zip` containing a single `job-pipeline` folder, with `SKILL.md`, `schema/`, `config/`, etc. directly inside it.
+6. In your Project, go to Settings → Customize → Skills → Add → **Upload a skill**, and upload `job-pipeline.zip`. This brings in `SKILL.md` together with `schema/`, `config/`, and everything else it refers to by relative path – uploading `SKILL.md` on its own would leave those references unreachable.
+7. Upload your CV and start adding applications as Project files, following `schema/SCHEMA.md`.
+8. Ask Claude to score a JD, log an application, or regenerate your dashboard.
+9. When you want to see the dashboard, ask Claude to produce it as an Artifact.
 
 ### Option B – Claude Cowork (recommended if you have it)
 1. Point Cowork at a local folder – your CV, and an `applications/` and `companies/` subfolder following `schema/SCHEMA.md`.
-2. Install `SKILL.md`.
+2. Install `SKILL.md` the same way you'd install any Cowork skill, from the same local folder – Cowork already has direct access to the rest of the repo (`schema/`, `config/`) alongside it, so there's no separate bundling step like Option A's.
 3. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes the local folder directly, so there's no separate upload step.
 
 Either way: **delete or ignore `examples/`** – it's a self-contained demo, not a template to build on top of. Your own data goes in your own folder or Project, never inside a clone of this repo (see Security below).
 
 ### Replacing the example data with your own
 The `examples/` folder is only ever read by this repo's own build script (`scripts/build_dashboard.py`) to produce the public demo page. It has no other function. Your real tracked applications should live somewhere private – a Claude.ai Project's own files, or a local folder you choose – following the same schema, but never committed to a public fork of this repo.
+
+### Keeping your CV baseline current
+Your CV drives every score, so keep it current as your experience changes. There's no separate process – just give Claude an updated version when you have one (re-upload the file in a Claude.ai Project, or edit/replace the file in your local folder for Cowork) and say so. Claude confirms which file it's now using and applies it to all scoring from that point on. Past scores are never silently rewritten – see `score.locked` in `schema/SCHEMA.md`.
 
 ## How scoring works
 
