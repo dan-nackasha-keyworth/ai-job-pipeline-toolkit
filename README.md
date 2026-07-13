@@ -68,6 +68,9 @@ Either way: **delete or ignore `examples/`** – it's a self-contained demo, not
 ### Replacing the example data with your own
 The `examples/` folder is only ever read by this repo's own build script (`scripts/build_dashboard.py`) to produce the public demo page. It has no other function. Your real tracked applications should live somewhere private – a Claude.ai Project's own files, or a local folder you choose – following the same schema, but never committed to a public fork of this repo.
 
+### Updating the skill later
+If you pull a newer version of this repo and want to update your Claude.ai skill, go to Settings → Customize → Skills → job-pipeline → the **⋮** menu → **Replace**, and select the new zip (same rename-and-rezip steps as Option A above). One thing worth knowing: replacing a skill's content doesn't affect any chat that was already open before the replace – it keeps using whatever version was loaded when that chat started. Start a **new chat** to pick up the update.
+
 ### Keeping your CV baseline current
 Your CV drives every score, so keep it current as your experience changes. There's no separate process – just give Claude an updated version when you have one (re-upload the file in a Claude.ai Project, or edit/replace the file in your local folder for Cowork) and say so. Claude confirms which file it's now using and applies it to all scoring from that point on. Past scores are never silently rewritten – see `score.locked` in `schema/SCHEMA.md`.
 
