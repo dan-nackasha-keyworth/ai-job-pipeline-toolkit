@@ -56,10 +56,12 @@ No git or terminal needed – this is entirely mouse-and-Explorer/Finder work.
 8. Ask Claude to score a JD, log an application, or regenerate your dashboard.
 9. When you want to see the dashboard, ask Claude to produce it as an Artifact.
 
+**A real, ongoing cost of this option: Project files are read-only to Claude.** It can score, log, and update everything correctly within a conversation, but it can only hand you back a downloadable file – it cannot write to your Project's knowledge directly. Every single logged application and status update needs you to download the file and add/replace it in the Project yourself, or the change isn't actually saved anywhere and won't be there next time. Fine for occasional use; worth knowing about before committing to tracking dozens of applications this way – see Option B below if that matters to you.
+
 ### Option B – Claude Cowork (recommended if you have it)
 1. Point Cowork at a local folder – your CV, and an `applications/` and `companies/` subfolder following `schema/SCHEMA.md`.
 2. Install `SKILL.md` the same way you'd install any Cowork skill, from the same local folder – Cowork already has direct access to the rest of the repo (`schema/`, `config/`) alongside it, so there's no separate bundling step like Option A's.
-3. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes the local folder directly, so there's no separate upload step.
+3. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes the local folder directly, so there's no separate upload step, and no download/re-upload step for every subsequent update either.
 
 Either way: **delete or ignore `examples/`** – it's a self-contained demo, not a template to build on top of. Your own data goes in your own folder or Project, never inside a clone of this repo (see Security below).
 
@@ -68,6 +70,8 @@ The `examples/` folder is only ever read by this repo's own build script (`scrip
 
 ### Keeping your CV baseline current
 Your CV drives every score, so keep it current as your experience changes. There's no separate process – just give Claude an updated version when you have one (re-upload the file in a Claude.ai Project, or edit/replace the file in your local folder for Cowork) and say so. Claude confirms which file it's now using and applies it to all scoring from that point on. Past scores are never silently rewritten – see `score.locked` in `schema/SCHEMA.md`.
+
+Role-tailored CVs and cover letters are a separate, later concern – see `application_materials` in `schema/SCHEMA.md`. A JD always gets scored against your baseline, since a tailored version doesn't exist yet for a role you haven't applied to. The question of what you actually submitted only comes up once you tell Claude you've applied.
 
 ## How scoring works
 

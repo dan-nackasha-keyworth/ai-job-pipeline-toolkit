@@ -184,6 +184,7 @@ def parse_application(path):
         "score": fm["score"],
         "next_interview_date": date_str(fm.get("next_interview_date")),
         "comp_band": fm.get("comp_band"),
+        "application_materials": fm.get("application_materials"),
         "jd_summary": jd_summary,
         "caveats": caveats,
         "briefing": briefing,

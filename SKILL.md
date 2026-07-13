@@ -23,7 +23,7 @@ Read `schema/SCHEMA.md` before doing anything else – it defines the file forma
 ## Platform detection
 
 - **Running in Cowork** (or any environment with local file access): read and write application files directly in the folder the user has pointed you at. Write the regenerated dashboard back to that same folder.
-- **Running in a Claude.ai Project**: read application files from the Project's knowledge files. Regenerate the dashboard as an Artifact when asked – Claude.ai has no access to a local filesystem, so there's no "write it back to disk" step; the Artifact *is* the output.
+- **Running in a Claude.ai Project**: read application files from the Project's knowledge files. **Project files are read-only from here – there is no way to write or update one directly, for a brand-new application or an edit to an existing one.** Every time you create or update an application file, output it as a downloadable document and **say plainly, every time, not just once**, that the user needs to add/replace it in the Project's files themselves for it to actually persist – otherwise it won't be there next time the pipeline is reviewed, rescored, or the dashboard is regenerated, and any edit you make in this conversation is invisible everywhere else until they do. Regenerate the dashboard as an Artifact when asked – that one's fine as pure output, nothing needs to be re-uploaded for it.
 
 If you're not sure which context you're in, ask once rather than guessing.
 
@@ -37,6 +37,7 @@ Locate the user's current CV/resume among their files (Project knowledge or loca
 - **More than one candidate file exists:** don't guess from filename or modified date alone – ask which one is current, and suggest the user keep exactly one live CV file going forward (any name) so this never comes up again.
 - **Updating it:** when the user provides a new version – a fresh upload, a pasted revision, an edited file – confirm plainly which file you're now treating as the baseline and that it replaces the old one for all scoring from that point forward. Don't silently start using a new file without saying so.
 - **Effect on past scores:** a CV update only changes scoring done from that point on. Never re-score an already-scored application against the new baseline unless the user explicitly asks – and never touch a `score.locked: true` application under any circumstance, per Step 4.
+- **Role-tailored CVs are a Step 4 concern, not a Step 1 one.** A user may later submit a role-tailored CV for a specific application instead of the baseline as-is. That doesn't change anything here: scoring at this stage always uses the current baseline, full stop – a tailored version doesn't exist yet for a role that hasn't been applied to. See Step 4's `application_materials` handling for what happens once an application actually goes out.
 
 ## Step 2: Score a job description (100 points)
 
@@ -76,7 +77,7 @@ This agent only ever reads public information about a company or a named individ
 
 ## Step 4: Log an application / update status
 
-Update the application file per `schema/SCHEMA.md` as things change, and update `status_date` to the date of every transition – it's the single source of truth the dashboard and recalibration agent both rely on, not a field to leave stale.
+Update the application file per `schema/SCHEMA.md` as things change, and update `status_date` to the date of every transition – it's the single source of truth the dashboard and recalibration agent both rely on, not a field to leave stale. **In a Claude.ai Project, this means outputting the updated file and reminding the user to re-add it to the Project themselves, every time – see Platform detection above.** Skipping that reminder means the update silently doesn't stick.
 
 **Status transitions.** The state machine is small and exhaustive – see `schema/SCHEMA.md` for the full table:
 
@@ -87,6 +88,7 @@ interviewing -> offer | rejected_after_interview | withdrew_after_interview
 ```
 
 - When the user confirms they've actually submitted an application for a role already scored under Step 2, move `status` from `scored` to `applied` and set `date_applied` to the real submission date. If instead they decide **not** to submit, move `status` to `didnt_apply` – don't just leave it at `scored` indefinitely, which should mean "still deciding," not "decided against it."
+- **At this exact transition** – and only here, never at Step 2 – ask what actually went out with the application: a role-tailored CV (or the baseline as-is), a cover letter, any supplementary responses. Record the answer in `application_materials` per `schema/SCHEMA.md`. Most applications will just use the baseline (`cv: null`) – that's the common case, not a gap to chase down. Don't ask this question while scoring; it isn't answerable yet, since tailored materials for a role nobody's applied to don't exist.
 - When a rejection or withdrawal comes in, check whether `status` has ever been `interviewing` for this application – if it has, use `rejected_after_interview`/`withdrew_after_interview`, not the plain `rejected`. This isn't pedantry: reaching interview stage validates the scoring rubric's prediction (jd_fit/seniority/competition) regardless of what happens afterward, and collapsing that into a flat rejection throws away exactly the signal Step 6 needs. There's no separate status for withdrawing after applying but before interviewing – log it as `rejected` and note the real reason (e.g. comp confirmed below floor) in the JD summary; it's rare enough, and ambiguous enough for the recalibration signal, that it doesn't need its own state.
 - `assumed_rejected` is for silence-based inference only – see Step 5. Never set it just because the user assumes a rejection is likely; only the configured silence window or the user's own explicit call justifies it.
 - Once `status` reaches any closed status, or `offer`, set `score.locked: true` and **never revise a locked score again for any reason** – it's a prediction evaluated by the outcome, not adjusted to match it.
@@ -95,7 +97,7 @@ interviewing -> offer | rejected_after_interview | withdrew_after_interview
 
 **Briefing pack – standard sections, not a menu.** Once `status` moves to `interviewing` or beyond, add the Briefing pack section per `schema/SCHEMA.md`. The five original fields (Company facts, Comp, Why it progressed/didn't, Watch-outs, Interview stage log) plus Unique selling points, Interviewer profiles, Prep questions, Questions to ask, and Notes are all **standard** – generate them by default, don't ask the user's permission first or wait to be asked for "more depth."
 
-- **Unique selling points, Prep questions, Questions to ask:** always attempt real synthesis, grounded specifically in the user's own CV and cover letters (Step 1) cross-referenced against this role and company – never generic interview advice. A USP or answer without a traceable evidence source doesn't belong in the file.
+- **Unique selling points, Prep questions, Questions to ask:** always attempt real synthesis, grounded specifically in what was actually submitted for this application – `application_materials` if set (Step 4), otherwise the baseline CV (Step 1) – cross-referenced against this role and company, never generic interview advice. Use the submitted materials, not whatever the baseline says by interview time if the two have since diverged: the interviewer read what was actually sent, not today's baseline. A USP or answer without a traceable evidence source doesn't belong in the file.
 - **Interviewer profiles:** only for interviewers the user has actually named (see Step 3). If none are known yet, write the section anyway with a single placeholder entry – don't omit the section.
 - **Notes:** the catch-all for anything situational (competitive landscape, warm-intro context, quotes from the user's own prior materials, a postmortem on why an earlier stage didn't land). Real content when there's something to say; a placeholder when there isn't.
 - **Regional intelligence is the one section that's genuinely optional, not standard.** Only add it when the role actually spans multiple markets in a way that matters for interview prep – a purely domestic role should never get an empty or placeholder regional table, just an omitted section. When it is relevant, this is general cultural/business-norm pattern knowledge, not a verified fact – say so plainly, the same way an estimated company fact gets flagged, rather than presenting it with company-facts-level confidence.

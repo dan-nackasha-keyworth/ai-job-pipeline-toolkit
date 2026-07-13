@@ -33,6 +33,11 @@ score:
 next_interview_date: null   # null, or the next confirmed interview date (YYYY-MM-DD)
 
 comp_band: "£140k-160k OTE"  # or null if unknown – absence is never penalised, see SKILL.md
+
+application_materials:       # null while status is "scored" – set once when status moves to "applied", never guessed
+  cv: null                   # null = the baseline CV was used as-is; otherwise the filename/description of a role-tailored CV
+  cover_letter: null         # null, or the filename/description of the cover letter actually submitted
+  supplementary: []          # any other submitted documents (supplementary responses, portfolio, etc.) – empty list if none
 ---
 
 ## JD summary
@@ -82,6 +87,8 @@ There is deliberately no status for withdrawing after applying but before interv
 **`score.locked`** becomes `true` once `status` reaches any closed status, or `offer` – the score is a prediction, evaluated by the outcome, never adjusted to match it. `offer` isn't in the closed-status list (it stays in the active group for sorting – still exciting, not buried with rejections) but is effectively terminal for locking purposes: this schema doesn't track what happens after an offer (accepted/declined/negotiated is out of scope), so nothing further would ever unlock it anyway. See `scripts/_status.py`'s `should_lock()`.
 
 **`next_interview_date`** only matters once `status` is `interviewing` – it's what lets the dashboard surface "what's coming up" instead of just a flat list. Set it to the next confirmed date whenever one is booked. Once that interview happens, set it back to `null` immediately if the next stage isn't scheduled yet – don't leave a past date sitting in the field. That's what makes a card fall to the back of the active group until a new date is actually known, rather than staying stuck at the top on a stale date.
+
+**`application_materials`** exists because the CV baseline isn't the whole story: some applications go out with a role-tailored CV, cover letter, or supplementary responses instead of (or alongside) the baseline, and some don't. This is deliberately **not** asked at scoring time (`status: scored`) – a JD gets scored against the current baseline, full stop, since tailored materials for a role you haven't even applied to yet don't exist. The question belongs at the `scored` → `applied` transition instead: what actually went out the door for this specific application? A `cv` of `null` means the baseline was used unmodified – that's the common case and not something to flag as missing. Once set, this is what interview-prep content (see Briefing pack below) should be grounded in, not necessarily whatever the baseline CV says by the time an interview happens – the interviewer read what was actually submitted, not today's baseline.
 
 ### Briefing pack
 
