@@ -182,7 +182,7 @@ One file per company, only created once the live-search verification agent has a
 }
 ```
 
-`confidence` is either `confirmed` or `estimated` – the latter for anonymised or unverifiable listings. Never presented as certain when it isn't (see `SKILL.md` → transparency rule). The same confirmed/estimated convention applies to interviewer research within a Briefing pack (see `SKILL.md` → Step 3) – individual public bios are typically sparser and staler than company data, and that should be flagged plainly, not smoothed over.
+`confidence` is either `confirmed` or `estimated`. `confirmed` requires at least two independent sources to agree (see `SKILL.md` → Step 3) – a single source, however authoritative it looks, is `estimated`. Anonymised or unverifiable listings are always `estimated`. Never presented as certain when it isn't (see `SKILL.md` → transparency rule). The same confirmed/estimated convention applies to interviewer research within a Briefing pack (see `SKILL.md` → Step 3) – individual public bios are typically sparser and staler than company data, and that should be flagged plainly, not smoothed over.
 
 Cache entries are considered fresh for 90 days. Past that, the next application to the same company triggers a fresh lookup rather than reusing stale data.
 

@@ -18,6 +18,7 @@ Exits 1 if the gate no longer passes against the current example data, so a
 future edit to examples/ that breaks the demo's own premise gets caught.
 """
 import json
+import math
 import os
 import re
 import statistics
@@ -35,6 +36,57 @@ WEIGHTS_PATH = os.path.join(ROOT, "config", "weights.json")
 COMPONENTS = ["jd_fit", "seniority", "competition", "comp", "blockers"]
 
 
+def standardize(matrix):
+    """Z-score each column. Returns (standardized matrix, means, stds)."""
+    n = len(matrix)
+    p = len(matrix[0])
+    means = [sum(row[j] for row in matrix) / n for j in range(p)]
+    stds = []
+    for j in range(p):
+        var = sum((row[j] - means[j]) ** 2 for row in matrix) / n
+        stds.append(var ** 0.5 if var > 0 else 1.0)
+    standardized = [[(row[j] - means[j]) / stds[j] for j in range(p)] for row in matrix]
+    return standardized, means, stds
+
+
+def sigmoid(z):
+    # Numerically stable form – avoids overflow on large |z|.
+    if z >= 0:
+        return 1.0 / (1.0 + math.exp(-z))
+    ez = math.exp(z)
+    return ez / (1.0 + ez)
+
+
+def fit_logistic_regression(X, y, l2=1.0, lr=0.3, iters=3000):
+    """
+    Plain-gradient-descent logistic regression with L2 (ridge) regularisation,
+    no external dependencies. L2 matters here specifically because n is small
+    relative to the 5 features – without it, coefficients on a handful of
+    dozens of outcomes can swing wildly. Features must already be standardized
+    (see standardize()) so coefficient magnitudes are comparable to each other.
+    """
+    n = len(X)
+    p = len(X[0])
+    coefs = [0.0] * p
+    intercept = 0.0
+    for _ in range(iters):
+        grad_coefs = [0.0] * p
+        grad_intercept = 0.0
+        for i in range(n):
+            z = intercept + sum(coefs[j] * X[i][j] for j in range(p))
+            err = sigmoid(z) - y[i]
+            grad_intercept += err
+            for j in range(p):
+                grad_coefs[j] += err * X[i][j]
+        grad_intercept /= n
+        for j in range(p):
+            grad_coefs[j] = grad_coefs[j] / n + (l2 * coefs[j] / n)
+        intercept -= lr * grad_intercept
+        for j in range(p):
+            coefs[j] -= lr * grad_coefs[j]
+    return intercept, coefs
+
+
 def load_applications():
     apps = []
     for fname in sorted(os.listdir(APPS_DIR)):
@@ -50,12 +102,14 @@ def main():
     weights = json.load(open(WEIGHTS_PATH, encoding="utf-8"))
     min_logged = weights["recalibration"]["min_logged_outcomes"]
     min_positive = weights["recalibration"]["min_positive_outcomes"]
+    min_logged_joint = weights["recalibration"].get("min_logged_outcomes_joint", min_logged)
 
     apps = load_applications()
     signals = [(a, recalibration_signal(a["status"])) for a in apps]
-    logged = [a for a, sig in signals if sig is not None]
-    positive = [a for a, sig in signals if sig == "positive"]
-    negative = [a for a, sig in signals if sig == "negative"]
+    logged_signals = [(a, sig) for a, sig in signals if sig is not None]
+    logged = [a for a, sig in logged_signals]
+    positive = [a for a, sig in logged_signals if sig == "positive"]
+    negative = [a for a, sig in logged_signals if sig == "negative"]
 
     gate_passes = len(logged) >= min_logged and len(positive) >= min_positive
 
@@ -82,6 +136,23 @@ def main():
         print(f"Components with no variance in example data: {', '.join(no_variance)}")
     else:
         print("All five components have variance across the example data – the recalibration agent has some signal on every component.")
+
+    print()
+    print(f"Joint model (logistic regression, L2-regularised) – threshold {min_logged_joint} logged outcomes:")
+    if len(logged) < min_logged_joint:
+        print(f"  BELOW THRESHOLD – have {len(logged)}, need {min_logged_joint}. A joint model needs proportionally "
+              f"more data than the single-component means above to avoid unstable coefficients; not shown.")
+    else:
+        X_raw = [[a["score"]["breakdown"][c] for c in COMPONENTS] for a, sig in logged_signals]
+        y = [1 if sig == "positive" else 0 for a, sig in logged_signals]
+        X, means, stds = standardize(X_raw)
+        intercept, coefs = fit_logistic_regression(X, y)
+        ranked = sorted(zip(COMPONENTS, coefs), key=lambda t: -abs(t[1]))
+        print("  Standardised coefficients (larger magnitude = stronger association with a positive outcome,")
+        print("  holding the other four components constant – this is what the per-component means above cannot show):")
+        for name, coef in ranked:
+            print(f"    {name:12s} {coef:+.3f}")
+        print("  Same caveat as the per-component means: a weak signal from a small sample, not a validated finding.")
 
     if not gate_passes:
         print("\nFAIL: example dataset no longer crosses the recalibration gate threshold.")

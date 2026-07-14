@@ -84,6 +84,13 @@ APPLICATIONS = [
     ("2026-05-30", "Oakridge Ventures", "Director of Product", "assumed_rejected", 64, "Tier 3 – Solid, worth applying",
      34, 11, 10, 9, 10, [], "£105k-118k OTE", "LinkedIn",
      "Applied and heard nothing since – no rejection, no further contact. Marked assumed_rejected after the configured silence window (see config/weights.json), not a confirmed rejection."),
+    ("2026-06-16", "Thistlewood Capital", "Director of Product", "rejected", 56, "Tier 3 – Solid, worth applying",
+     31, 11, 8, 6, 10, [], "£100k-112k base", "LinkedIn",
+     "Mid-size asset manager, moderate applicant pool – added to give the recalibration agent's joint model enough data points to clear its higher threshold."),
+    ("2026-06-18", "Fenwick Outdoors", "Head of Product", "rejected", 49, "Tier 4 – Long shot",
+     29, 10, 5, 5, 10, ["competition"], None, "LinkedIn", "Large, well-known consumer outdoor brand – broad applicant pool."),
+    ("2026-06-20", "Amberline Media", "VP Product", "rejected", 62, "Tier 3 – Solid, worth applying",
+     33, 12, 9, 8, 10, [], "£108k-120k OTE", "Company site", "Mid-size media company, moderately competitive."),
 ]
 
 # Fully fleshed briefing-pack applications – interviewing / offer / and the

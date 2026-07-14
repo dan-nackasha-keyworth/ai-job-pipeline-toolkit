@@ -238,6 +238,46 @@ With the wrong-skill issue resolved, a fresh scoring request ([REDACTED-COMPANY]
 
 All three Test 13 fixes are now verified live, not just committed.
 
+## Test 14 – Joint model for recalibration (logistic regression, no external dependencies)
+
+The per-component means in Tests 3/6/7 compare each of the five components independently, which can't distinguish "this component is genuinely predictive" from "this component happens to be correlated with a genuinely predictive one." Added a joint model – L2-regularised logistic regression fit via plain gradient descent (no numpy/scikit-learn dependency, consistent with the rest of the repo) over standardised component scores, predicting the positive/negative recalibration signal – to `scripts/verify_recalibration.py`, gated on a separate, higher threshold (`min_logged_outcomes_joint: 25` vs. the simple means' `min_logged_outcomes: 20`) since a 5-feature joint model needs proportionally more data to produce stable coefficients than five independent single-feature comparisons do.
+
+Added three new simple `rejected` examples (Thistlewood Capital, Fenwick Outdoors, Amberline Media) specifically to push the example set's logged-outcome count from 24 to 27 – comfortably past the new joint-model threshold, so this could actually run against real data rather than only being demonstrated in the below-threshold state.
+
+Ran `python scripts/verify_recalibration.py` against the updated 35-application example set:
+
+```
+Total applications: 35
+Logged outcomes: 27 (threshold: 20)
+Positive outcomes: 7 (threshold: 3)
+Gate: PASS
+
+jd_fit       positive mean= 38.7  negative mean= 33.7  diff= +5.0
+seniority    positive mean= 13.6  negative mean= 11.3  diff= +2.2
+competition  positive mean= 14.3  negative mean=  9.5  diff= +4.8
+comp         positive mean=  9.1  negative mean=  8.0  diff= +1.1
+blockers     positive mean= 10.0  negative mean=  9.7  diff= +0.3
+
+Joint model (logistic regression, L2-regularised) – threshold 25 logged outcomes:
+  Standardised coefficients (larger magnitude = stronger association with a positive outcome,
+  holding the other four components constant – this is what the per-component means above cannot show):
+    seniority    +1.441
+    jd_fit       +0.608
+    blockers     +0.370
+    competition  +0.176
+    comp         -0.165
+```
+
+**This is a genuinely interesting, real divergence, not a contrived one:** `competition` shows the second-strongest simple mean difference (+4.8) but the second-*weakest* joint coefficient (+0.176) – consistent with its predictive-looking mean difference being substantially explained by correlation with `seniority` and `jd_fit` (more senior, better-fitting roles in this example set also tend to be smaller, lower-competition companies) rather than `competition` doing independent predictive work of its own. `seniority`, by contrast, has a modest simple mean difference (+2.2, the smallest of the five) but by far the largest joint coefficient (+1.441) – the opposite pattern, where its true independent effect is being partly masked in the simple comparison. `comp` flips sign entirely (simple mean +1.1, joint coefficient -0.165), though its magnitude in both is small enough that this is plausibly noise rather than a real effect – exactly the kind of result the "weak signal, not a validated finding" caveat exists for. This is real output from real (synthetic) data, not a designed-to-impress result – it happens to demonstrate the feature's value well because the underlying correlation pattern in the example set is real.
+
+Also ran `python scripts/verify_recalibration.py` with `min_logged_outcomes_joint` temporarily raised in `config/weights.json` (not committed) to confirm the below-threshold path: correctly prints `BELOW THRESHOLD – have 27, need <raised value>` and omits the coefficient table, without affecting the simple per-component means or the overall gate's pass/fail exit code.
+
+## Test 15 – Live-search corroboration requirement
+
+`SKILL.md` Step 3 previously allowed marking a fact `confirmed` off a single search result. Changed to require at least two independent sources agreeing before `confirmed` is used; a single source or disagreeing sources now means `estimated`, stated plainly. `schema/SCHEMA.md`'s `confidence` field description updated to match.
+
+This is an LLM-interpreted instruction change (not a mechanical one `verify_consistency.py` can check), so it can't be proven by a script the way Test 14 was – it's a documentation/behavior change to verify in a live session the same way Tests 1, 2, and 13 were, not yet re-verified against a fresh session as of this commit. Flagged here rather than silently assumed to work.
+
 ## How to reproduce this
 
 **The mechanical parts (Test 3's statistics, Test 5/6's consistency checks)** are fully reproducible right now: `python scripts/verify_recalibration.py` and `python scripts/verify_consistency.py`. Both re-run in CI on every push that touches `examples/`, `docs/index.html`, `schema/SCHEMA.md`, `scripts/_status.py`, or `config/weights.json`, so none of this is a one-time check.

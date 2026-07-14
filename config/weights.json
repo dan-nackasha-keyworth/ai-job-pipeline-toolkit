@@ -27,7 +27,8 @@
   "recalibration": {
     "min_logged_outcomes": 20,
     "min_positive_outcomes": 3,
-    "_notes": "The recalibration agent will not propose any weight change below these thresholds – it will say plainly that there isn't enough data yet. Even at the threshold, treat any suggestion as a weak signal, not a validated finding. These numbers are a deliberately conservative floor, not a target to rush toward. 'Positive'/'negative' here are derived from status via scripts/_status.py – reaching interview stage counts as positive even if the process later ends in rejection or withdrawal."
+    "min_logged_outcomes_joint": 25,
+    "_notes": "The recalibration agent will not propose any weight change below these thresholds – it will say plainly that there isn't enough data yet. Even at the threshold, treat any suggestion as a weak signal, not a validated finding. These numbers are a deliberately conservative floor, not a target to rush toward. 'Positive'/'negative' here are derived from status via scripts/_status.py – reaching interview stage counts as positive even if the process later ends in rejection or withdrawal. min_logged_outcomes_joint gates the joint (multi-component) model specifically – a joint model needs proportionally more data than a single-component comparison to avoid unstable coefficients, so its threshold sits above min_logged_outcomes rather than reusing it."
   },
 
   "pipeline_hygiene": {
