@@ -1,6 +1,6 @@
 # Testing log
 
-This repo's skill logic was actually executed, not just written and left unverified. Nineteen tests, run across sessions between 2026-07-09 and 2026-07-14, documented here as evidence rather than assertion.
+This repo's skill logic was actually executed, not just written and left unverified. Twenty tests, run across sessions between 2026-07-09 and 2026-07-14, documented here as evidence rather than assertion.
 
 **Note on scope:** the two tests below that use a real company ([REDACTED-COMPANY]) are validation exercises only – no application was submitted, no contact was made with anyone, and [REDACTED-COMPANY]'s real data is never written into `examples/`, which stays 100% fictional as documented in the README. This log is the one place in the repo where a real, well-known public company is named, specifically to prove the tool's mechanisms work on real inputs, not just synthetic ones designed to make it look good.
 
@@ -346,6 +346,37 @@ Started as "write real Score rationale text for all 37 examples" and surfaced tw
 **An honest, unforced side-effect worth naming:** with both bugs fixed, almost every example's score moved – mostly upward, since the sum-bug had generally under-counted and the null-comp-band bug had wrongly penalised roughly half the dataset. The corrected dataset now skews toward Tier 1-2 more than the original did; no low-scoring examples were artificially reintroduced to preserve visual tier variety, since doing that would have been the same "shape the data to look right" mistake this whole test exists to move away from. Re-ran `python scripts/verify_recalibration.py` against the corrected data and the recalibration stats shifted accordingly, most notably `comp`: previously a clearly positive component (`diff +0.8` to `+1.1` across earlier tests), now marginally negative (`diff -0.4`, joint coefficient `-0.447`) – a real, direct consequence of several `interviewing`/`offer` briefing-pack examples (Pemberton, Briarcliff, Silverlake) having genuinely below-floor or estimated comp under the new, more honest scoring, while several `rejected` examples now correctly score comp at or near 10. Not adjusted after the fact to look more flattering – this is what the honest numbers produced.
 
 Verified live in the browser (DOM inspection, not just code review) on both the corrected score-sum case (Meridian: `65` shown, matching `30+12+4+9+10`) and the neutral-default comp case (Granite Peak: `comp (6/10)` with the honest "no reliable signal" explanation, not a placeholder and not a max score).
+
+## Test 20 – Duplicate/reposted-role detection
+
+Public backlog item: nothing checked whether a company+role combination had already been scored or tracked before `SKILL.md` Step 2 created a new application file – an accidental re-paste or a genuine repost would silently create a second, disconnected record instead of surfacing the existing one.
+
+Added `scripts/check_duplicate.py`, run by `SKILL.md` Step 2 immediately before file creation. Deliberately narrow matching, not fuzzy/similarity-scored: company names are normalised (lowercased, legal suffixes like Inc/Ltd/LLC/Corp/plc stripped, punctuation and whitespace collapsed) and matched exactly; role titles are compared the same way, exact-after-normalisation only. No partial or substring title matching – that's the fast route to a false positive ("Head of Product" flagging against "Head of Product Strategy", a genuinely different role). Two tiers, both advisory, neither ever blocks:
+
+- **HIGH confidence** – same normalised company, same normalised title: likely an accidental duplicate or an exact repost.
+- **LOW confidence** – same normalised company, different title: could be a genuinely distinct role (the real, common "Role 1 / Role 2 at the same company" pattern) or the same role reworded – flagged as worth a quick check, not treated as a problem.
+
+Ran against the real example dataset (`examples/applications/`, 32 files, no two of which currently share a company – confirmed by listing every `company`/`role` pair before testing) to exercise all three outcomes for real, not by inspection:
+
+```
+$ python scripts/check_duplicate.py --company "Totally New Company" --role "Head of Product"
+No existing tracked application found for 'Totally New Company' / 'Head of Product'.
+
+$ python scripts/check_duplicate.py --company "Northwind Retail Technologies" --role "Head of Product, Platform"
+HIGH confidence match - same company and same role title already tracked:
+  2026-04-02-northwind-retail-technologies-head-of-product--platform.md  (status: rejected, scored: 2026-04-02)
+Likely an accidental duplicate, or this exact listing reposted. Confirm with the user before creating a new file rather than silently doing so.
+
+$ python scripts/check_duplicate.py --company "northwind retail technologies, inc." --role "head of product, platform"
+HIGH confidence match - [same result – confirms normalisation survives a legal suffix and case difference, not just an exact string match]
+
+$ python scripts/check_duplicate.py --company "Northwind Retail Technologies" --role "Head of Growth"
+LOW confidence match - 'Northwind Retail Technologies' already has 1 other tracked application(s) under a different role title:
+  2026-04-02-northwind-retail-technologies-head-of-product--platform.md  -> 'Head of Product, Platform' (status: rejected)
+Could be a genuinely distinct role, or the same one under a reworded title. Ask, don't assume either way.
+```
+
+All four cases produced the correct, distinct outcome: true negative, exact-match true positive, normalised true positive (proving the suffix/case stripping actually does something rather than just existing in the code), and the low-confidence same-company-different-role case. `SKILL.md` Step 2 gained a new "Before creating the file, check for an existing one" instruction, including the Claude.ai-Project fallback (no code execution there, so the same check is done by eye against the visible application files) since this script only runs where code execution is available.
 
 ## How to reproduce this
 
