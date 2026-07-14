@@ -1,0 +1,11 @@
+{
+  "run_date": "2026-07-14",
+  "run_notes": "Scored directly against eval/golden_set.md, applying SKILL.md Step 2's rubric mechanically, component by component, without revisiting eval/expected_bands.json's bands while scoring. See TESTING.md Test 16 for the rationale behind each score.",
+  "results": [
+    { "case": "Verdant Analytics", "jd_fit": 42, "seniority": 15, "competition": 18, "comp": 10, "blockers": 10 },
+    { "case": "Helios Systems Corp", "jd_fit": 30, "seniority": 14, "competition": 3, "comp": 10, "blockers": 10 },
+    { "case": "Titan Aerospace Group", "jd_fit": 18, "seniority": 2, "competition": 2, "comp": 10, "blockers": 8 },
+    { "case": "Bramston Retail Holdings", "jd_fit": 40, "seniority": 14, "competition": 14, "comp": 2, "blockers": 10 },
+    { "case": "Meridian Financial Services", "jd_fit": 38, "seniority": 15, "competition": 15, "comp": 10, "blockers": 2 }
+  ]
+}

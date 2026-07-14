@@ -278,6 +278,30 @@ Also ran `python scripts/verify_recalibration.py` with `min_logged_outcomes_join
 
 This is an LLM-interpreted instruction change (not a mechanical one `verify_consistency.py` can check), so it can't be proven by a script the way Test 14 was – it's a documentation/behavior change to verify in a live session the same way Tests 1, 2, and 13 were, not yet re-verified against a fresh session as of this commit. Flagged here rather than silently assumed to work.
 
+## Test 16 – Eval harness: five-case golden set, real scoring run
+
+Built a small, repeatable eval (`eval/`) for the one thing Tests 1/2/13 never systematised: whether the scoring rubric produces stable, defensible output across distinct scenarios, checkable again in the future without re-deriving expected behaviour from scratch each time.
+
+Wrote `eval/golden_set.md` – five fictional JDs, each chosen to exercise one distinct scoring scenario rather than five similar "good fit" cases: an ideal fit at a small company, competition drag from a large/famous employer, a severe seniority stretch (the asymmetric rule's one "should score near zero" case), a confirmed comp shortfall, and a confirmed non-immigration blocker (FCA regulatory status, not right-to-work). Expected score bands for every component, plus the reasoning behind each band, were written down in `eval/expected_bands.json` **before** any actual scoring – not derived afterward to fit whatever came out.
+
+Then actually scored all five, mechanically applying `SKILL.md` Step 2's rubric, without revisiting the pre-written bands while scoring. Recorded in `eval/results/2026-07-14.json`. Ran `python scripts/verify_eval_results.py`:
+
+```
+Verdant Analytics:            total = 95  (expected 86-100)
+Helios Systems Corp:          total = 67  (expected 55-72)
+Titan Aerospace Group:        total = 40  (expected 35-55)
+Bramston Retail Holdings:     total = 80  (expected 67-83)
+Meridian Financial Services:  total = 80  (expected 66-87)
+
+PASS: all 5 golden-set cases fall within their expected bands.
+```
+
+All five landed inside their pre-registered bands on the first run, including the two hardest to get right: Titan Aerospace's severe seniority stretch scored `seniority=2/15` (band 0-3, the asymmetric rule doing exactly what it's supposed to), and Bramston Retail's confirmed below-floor comp scored `comp=2/10` (band 0-3) while everything else about the role scored well – the shortfall landed specifically on the comp component, not smeared across others.
+
+**Confirmed the checker actually catches a real failure, not just the happy path:** deliberately corrupted a copy of the results file (zeroed out Verdant Analytics's `comp` score, which should have been a confirmed 10) and re-ran the checker – it correctly reported two violations (`comp` out of band, and the resulting total falling below its band) and exited 1. Deleted the corrupted copy afterward; it was never a real result.
+
+Wired `scripts/verify_eval_results.py` into CI, gated on changes to `eval/expected_bands.json`, `eval/results/**`, or the script itself – CI checks a *committed* results file against the bands, it can't produce a new scoring run itself (no API key, by design – see `eval/README.md`).
+
 ## How to reproduce this
 
 **The mechanical parts (Test 3's statistics, Test 5/6's consistency checks)** are fully reproducible right now: `python scripts/verify_recalibration.py` and `python scripts/verify_consistency.py`. Both re-run in CI on every push that touches `examples/`, `docs/index.html`, `schema/SCHEMA.md`, `scripts/_status.py`, or `config/weights.json`, so none of this is a one-time check.

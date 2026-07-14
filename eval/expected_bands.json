@@ -1,0 +1,30 @@
+{
+  "_notes": "Structured form of the bands defined in eval/golden_set.md, written before any actual scoring run. Read by scripts/verify_eval_results.py to check a results file against these bands. Keep this in sync with golden_set.md's prose if either changes.",
+  "cases": [
+    {
+      "case": "Verdant Analytics",
+      "bands": { "jd_fit": [38, 45], "seniority": [13, 15], "competition": [15, 20], "comp": [10, 10], "blockers": [10, 10] },
+      "total_band": [86, 100]
+    },
+    {
+      "case": "Helios Systems Corp",
+      "bands": { "jd_fit": [28, 37], "seniority": [12, 15], "competition": [0, 6], "comp": [10, 10], "blockers": [10, 10] },
+      "total_band": [55, 72]
+    },
+    {
+      "case": "Titan Aerospace Group",
+      "bands": { "jd_fit": [15, 26], "seniority": [0, 3], "competition": [0, 8], "comp": [10, 10], "blockers": [6, 10] },
+      "total_band": [35, 55]
+    },
+    {
+      "case": "Bramston Retail Holdings",
+      "bands": { "jd_fit": [35, 43], "seniority": [12, 15], "competition": [10, 17], "comp": [0, 3], "blockers": [10, 10] },
+      "total_band": [67, 83]
+    },
+    {
+      "case": "Meridian Financial Services",
+      "bands": { "jd_fit": [34, 42], "seniority": [12, 15], "competition": [10, 17], "comp": [10, 10], "blockers": [0, 3] },
+      "total_band": [66, 87]
+    }
+  ]
+}

@@ -11,7 +11,7 @@ An open-source job-application tracker and JD-fit scorer, built as a Claude skil
 
 The example above is entirely synthetic – fictional companies, fictional applications, generated to show what the tool produces. See "Getting started" to point it at your own data.
 
-**The skill logic itself has actually been run, not just written.** See [`TESTING.md`](TESTING.md) for the results: a real live-search verification against a real public company, a full scoring run against a real (if short-lived – see the log) job posting, and the recalibration agent run for real against the example dataset, including an honest account of what it did and didn't prove.
+**The skill logic itself has actually been run, not just written.** See [`TESTING.md`](TESTING.md) for the results: a real live-search verification against a real public company, a full scoring run against a real (if short-lived – see the log) job posting, and the recalibration agent run for real against the example dataset, including an honest account of what it did and didn't prove. A repeatable five-case scoring eval also lives in [`eval/`](eval/README.md), with pre-registered expected score bands checked in CI on every change.
 
 ## What this actually is
 

@@ -11,6 +11,12 @@ name: Verify example dashboard is in sync
 #    docs/index.html's STATUS_ORDER matches scripts/_status.py – catches
 #    documentation/parser and Python/JS drift (see
 #    scripts/verify_consistency.py; this exact class of bug shipped once).
+# 4. The most recently committed eval/results/*.json run still falls
+#    within eval/expected_bands.json – catches someone loosening or
+#    tightening a band without re-running the scoring eval against it
+#    (see scripts/verify_eval_results.py). Does not itself run new
+#    scoring – that's an LLM-interpreted step, not something CI can do
+#    without an API key this repo deliberately doesn't use.
 #
 # No secrets, no API keys, nothing to configure – uses only the default
 # GITHUB_TOKEN GitHub Actions provides automatically for checkout.
@@ -26,6 +32,9 @@ on:
       - "scripts/build_dashboard.py"
       - "scripts/verify_recalibration.py"
       - "scripts/verify_consistency.py"
+      - "scripts/verify_eval_results.py"
+      - "eval/expected_bands.json"
+      - "eval/results/**"
       - "config/weights.json"
   pull_request:
     branches: [main]
@@ -60,3 +69,6 @@ jobs:
 
       - name: Verify SCHEMA.md/parser and Python/JS status-list consistency
         run: python scripts/verify_consistency.py
+
+      - name: Verify latest eval run against expected score bands
+        run: python scripts/verify_eval_results.py
