@@ -81,7 +81,7 @@ Role-tailored CVs and cover letters are a separate, later concern – see `appli
 Five components, weighted per `config/weights.json` (edit that file to change emphasis – see its `_notes` field): JD fit, seniority alignment, competition estimate, comp alignment, and blockers (visa/right-to-work/etc). Full logic in `SKILL.md`.
 
 Two agentic pieces, both bounded and on-demand – never a background process:
-- **Live-search verification**: when scoring, the skill looks up real company facts (size, funding stage) rather than guessing from memory, and caches the result per company so you're not re-searching every time you apply to the same employer twice.
+- **Live-search verification**: when scoring, the skill looks up real company facts (size, funding stage) rather than guessing from memory, and caches the result per company so you're not re-searching every time you apply to the same employer twice. A fact is only marked `confirmed` once two independent sources agree – a single source, however authoritative it looks, is marked `estimated` instead.
 - **Recalibration** (ask for this explicitly – it never runs on its own): reviews your own logged outcomes and suggests weight adjustments, but only once you have enough data – see `config/weights.json → recalibration` for the exact thresholds, and why they're deliberately conservative.
 
 ## Security
@@ -105,10 +105,11 @@ Explicitly out of scope, by design, not oversight:
 
 1. `python scripts/generate_examples.py` – regenerates `examples/` from scratch if it's ever changed.
 2. `python scripts/build_dashboard.py` – rebuilds `docs/index.html` from whatever's currently in `examples/applications/`.
-3. `python scripts/verify_recalibration.py` – sanity-checks the recalibration agent's gate and per-component signal against the current example data.
+3. `python scripts/verify_recalibration.py` – sanity-checks the recalibration agent's gate, per-component signal, and joint-model coefficients against the current example data.
 4. `python scripts/verify_consistency.py` – checks `SCHEMA.md`'s documented Briefing pack example actually parses, and that `docs/index.html`'s status list matches `scripts/_status.py`.
-5. Enable GitHub Pages: Settings → Pages → Source → Deploy from branch → `main` → `/docs`. No Actions workflow needed.
-6. Update the demo link at the top of this README once Pages is live.
+5. `python scripts/verify_eval_results.py` – checks the latest scoring-eval run (`eval/results/`) against its pre-registered expected bands (`eval/expected_bands.json`).
+6. Enable GitHub Pages: Settings → Pages → Source → Deploy from branch → `main` → `/docs`. No Actions workflow needed.
+7. Update the demo link at the top of this README once Pages is live.
 
 **Troubleshooting a stuck Pages deployment:** if GitHub Actions shows a "pages build and deployment" run as successful but the live site still serves old content (check via `curl -I` on the Pages URL and compare the `Last-Modified` header to your latest commit time), that's a GitHub-side publish issue, not a problem with the repo – the build succeeded but the CDN artifact didn't actually update. Fix: Settings → Pages → change the source folder to something else, save, then change it back to `/docs` and save again. This forces a fresh deployment and has reliably cleared the stuck state.
 
