@@ -43,6 +43,17 @@ Every status is reached from exactly one place – no other transitions exist. T
 
 ## Getting started
 
+### Before you start: organising your own files
+
+`SKILL.md` handles CV ambiguity reactively – if it finds more than one candidate CV file, it asks which one is current rather than guessing (see Step 1). A little upfront organisation avoids that question coming up at all, and makes your own files easier to navigate as your pipeline grows:
+
+- **Keep exactly one current CV file, not a series of dated copies.** Overwrite or replace it as your experience changes rather than saving `CV-v2.pdf`, `CV-v3-final.pdf`, etc. alongside each other – the skill treats your CV as a single evolving baseline (see "Keeping your CV baseline current" below), and a folder with several similarly-named CVs is exactly the ambiguity Step 1 has to ask you to resolve.
+- **If you do want to keep a history of past CV versions** (useful for seeing what a specific past application actually went out with), put them somewhere clearly separate from the current one – a dated archive folder, not mixed in alongside it.
+- **Keep job descriptions you're scoring somewhere separate from your CV and cover letters**, so it's obvious at a glance which files are your own materials versus roles you're evaluating.
+- **Keep recruiter/networking outreach separate from tracked applications.** Not every conversation with a recruiter or contact is a role worth scoring and logging – mixing the two makes it harder to tell "a real application in the pipeline" from "a conversation that hasn't turned into one yet."
+
+None of this is enforced by the skill – it's a suggestion based on what tends to cause friction, not a required structure.
+
 ### Option A – Claude.ai Project
 No git or terminal needed – this is entirely mouse-and-Explorer/Finder work.
 
