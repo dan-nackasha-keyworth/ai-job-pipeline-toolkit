@@ -135,6 +135,11 @@ def parse_application(path):
         return sm.group(1).strip() if sm else None
 
     jd_summary = section("JD summary") or ""
+    # Structurally a one-line-per-component bulleted list (see SCHEMA.md),
+    # not prose - parsed into a list and rendered as bullets (renderQuestions
+    # in docs/index.html), same as Questions to ask, rather than squashed
+    # into a single <p> the way jd_summary/caveats are.
+    score_rationale = parse_plain_bullets(section("Score rationale") or "")
     caveats = section("Caveats") or ""
 
     app_id = os.path.splitext(os.path.basename(path))[0]
@@ -186,6 +191,7 @@ def parse_application(path):
         "comp_band": fm.get("comp_band"),
         "application_materials": fm.get("application_materials"),
         "jd_summary": jd_summary,
+        "score_rationale": score_rationale,
         "caveats": caveats,
         "briefing": briefing,
     }

@@ -316,6 +316,16 @@ Ran this via a genuinely independent agent with zero context on this repo's buil
 
 **One minor, unrelated observation, not a failure of what this test was checking:** the output's frontmatter used `source: null` where the user hadn't stated which channel (LinkedIn, referral, etc.) the application came through. `SCHEMA.md` documents `source` as "optional, free text" without an explicit convention for the not-yet-known case – arguably should have asked, or used an explicit placeholder string consistent with the Briefing pack's own `Currently unknown` convention, rather than silently writing `null`. Noted here for completeness rather than opened as a new backlog item; low-stakes enough to fold into the next unrelated SCHEMA.md pass rather than treated as urgent.
 
+## Test 18 – Score rationale surfaced for every application, not just Briefing Pack cards
+
+Public backlog item: `## Score rationale` exists in every application file per `SCHEMA.md`'s own template, but `scripts/build_dashboard.py` never parsed it into the dashboard's data at all – not even for applications with a full Briefing Pack. It was invisible everywhere, not just for non-interview-stage roles.
+
+Added parsing (`build_dashboard.py`, reusing the existing `parse_plain_bullets()` helper already used for Questions to ask, since Score rationale is structurally the same shape – a bulleted, one-line-per-component list, not prose) and rendering (`docs/index.html`, a new `renderRationale()` following the same pattern as `renderQuestions()`), placed directly under the score bars it explains and above the JD summary – on every card, regardless of status, using the card's existing expand/collapse mechanism rather than a new UI element.
+
+Verified live in the browser (`python -m http.server` against `docs/`, driven via `javascript_tool` DOM inspection since screenshots weren't rendering this session): confirmed the "Score rationale" section appears in the correct position (second, after "Score breakdown") on both a Briefing Pack card (Briarcliff AI) and, more importantly for this backlog item specifically, a plain `scored` card with no Briefing Pack at all (Elmscroft Data) – both showed the correct five-item bulleted list.
+
+**A real, distinct finding along the way, not fixed here:** the example dataset's own `## Score rationale` content is thin – every one of the 37 example applications currently just restates the number (`"JD fit: 41/45"`) rather than the actual one-line reasoning `SKILL.md` Step 2's "Output" instruction asks for. The mechanism now correctly surfaces whatever's there, but "whatever's there" in the demo data isn't a good demonstration of the feature's real value. Rewriting rationale text for 37 examples is a distinct, separate content task from the dashboard mechanism this backlog item was actually about – not done as part of this change, added to `ISSUES.md` as its own item instead of silently expanding scope here.
+
 ## How to reproduce this
 
 **The mechanical parts (Test 3's statistics, Test 5/6's consistency checks)** are fully reproducible right now: `python scripts/verify_recalibration.py` and `python scripts/verify_consistency.py`. Both re-run in CI on every push that touches `examples/`, `docs/index.html`, `schema/SCHEMA.md`, `scripts/_status.py`, or `config/weights.json`, so none of this is a one-time check.

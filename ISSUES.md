@@ -2,9 +2,9 @@
 
 Known gaps to revisit.
 
-## Score visibility for non-interview-stage applications
+## Example dataset's Score rationale text is thin
 
-Score rationale currently only surfaces in full via the Briefing Pack, which is only generated once an application reaches `interviewing` or later. Most applications never get that far, so their score rationale lives only in the application file's own prose, with no dashboard-level way to browse or compare it. Worth deciding whether the dashboard should surface a condensed score rationale for every application, not just ones with a full Briefing Pack.
+Every one of the 37 example applications' `## Score rationale` section just restates the component score (`"JD fit: 41/45"`) rather than the one-line reasoning `SKILL.md` Step 2's own "Output" instruction calls for. The dashboard now correctly surfaces this section on every card (see `TESTING.md` Test 18), but the demo content itself isn't a good showcase of that feature's value. Worth rewriting rationale text for at least a representative subset of examples with real, specific reasoning per component.
 
 ## Duplicate/reposted-role detection
 
