@@ -76,9 +76,10 @@ No git or terminal needed – this is entirely mouse-and-Explorer/Finder work.
 ### Option B – Claude Cowork (the only option with an always-current dashboard)
 Cowork's dashboards are **Live Artifacts** – Anthropic's own persistent, pinnable, auto-updating dashboard mechanism, saved to your Artifacts library independent of any one chat. This is the actual match for a real ongoing tracker; Option A's Publish route (above) gets you a listed, shareable snapshot, not a live one.
 
-1. Point Cowork at a local folder – your CV, and an `applications/` and `companies/` subfolder following `schema/SCHEMA.md`.
-2. Install `SKILL.md` the same way you'd install any Cowork skill, from the same local folder – Cowork already has direct access to the rest of the repo (`schema/`, `config/`) alongside it, so there's no separate bundling step like Option A's.
-3. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes the local folder directly, so there's no separate upload step, and no download/re-upload step for every subsequent update either. **Dashboards produced this way are Live Artifacts** – pinnable and current – which is the one thing Option A's Publish route can't replicate, however often you re-publish.
+1. Create a Claude.ai Project first, and start your Cowork chat inside it – rather than a loose Cowork chat with no Project at all. Cowork itself doesn't require this, but it keeps the chat history, memory, and files scoped together the same way a real ongoing tracker needs to be, and it's how this pattern actually gets used in practice.
+2. Point Cowork at a local folder – your CV, and an `applications/` and `companies/` subfolder following `schema/SCHEMA.md`.
+3. Install `SKILL.md` the same way you'd install any Cowork skill, from the same local folder – Cowork already has direct access to the rest of the repo (`schema/`, `config/`) alongside it, so there's no separate bundling step like Option A's.
+4. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes the local folder directly, so there's no separate upload step, and no download/re-upload step for every subsequent update either. **Dashboards produced this way are Live Artifacts** – pinnable and current – which is the one thing Option A's Publish route can't replicate, however often you re-publish.
 
 Either way: **delete or ignore `examples/`** – it's a self-contained demo, not a template to build on top of. Your own data goes in your own folder or Project, never inside a clone of this repo (see Security below).
 
