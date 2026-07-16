@@ -81,6 +81,8 @@ Cowork's dashboards are **Live Artifacts** – Anthropic's own persistent, pinna
 3. Install `SKILL.md` the same way you'd install any Cowork skill, from the same local folder – Cowork already has direct access to the rest of the repo (`schema/`, `config/`) alongside it, so there's no separate bundling step like Option A's.
 4. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes the local folder directly, so there's no separate upload step, and no download/re-upload step for every subsequent update either. **Dashboards produced this way are Live Artifacts** – pinnable and current – which is the one thing Option A's Publish route can't replicate, however often you re-publish.
 
+**Only run one Cowork chat against your data at a time.** Each Cowork chat works from its own snapshot of your local folder taken when that chat started – a second chat (even in the same Project) pointed at the same folder can't see edits the first one makes, and vice versa. Whichever one saves last silently overwrites the other's changes, with no merge and no warning – the same underlying cause as the skill-update behaviour described below (a chat keeps using whatever it loaded when it started), just applied to your actual data instead of just the skill file. Stick to a single active Cowork chat per Project; close one before starting another against the same data.
+
 Either way: **delete or ignore `examples/`** – it's a self-contained demo, not a template to build on top of. Your own data goes in your own folder or Project, never inside a clone of this repo (see Security below).
 
 ### Making it yours
