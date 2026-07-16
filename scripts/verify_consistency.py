@@ -49,7 +49,14 @@ Consistency checks that nothing else in CI catches:
    The title tag specifically was missed once already even after the
    subtitle fix shipped - caught only when pointed out, not proactively -
    which is exactly why it's a required parameter now rather than a second
-   reminder sentence to remember.
+   reminder sentence to remember. A second, separate title bug shipped after
+   that fix: a <!--__TITLE__--> marker pair, copying the subtitle's pattern,
+   rendered as literal visible text in the browser tab on the live public
+   demo, because <title> is an HTML raw-text element where comment syntax
+   isn't parsed as a comment - unlike the subtitle's <div>, where it works
+   correctly. Fixed by matching <title>...</title> directly instead, with no
+   marker needed since the tag itself is unique. This check now also asserts
+   no "__TITLE__" string ever appears in the output, closing that bug class.
 
 Run from the repo root: python scripts/verify_consistency.py
 Exits 1 on any mismatch.
@@ -213,7 +220,7 @@ def check_dashboard_injection_survives_embedded_newline():
     html = (
         "PREFIX /*__DATA__*/OLD/*__END_DATA__*/ "
         "<!--__SUBTITLE__-->OLD SUBTITLE<!--__END_SUBTITLE__--> "
-        "<title><!--__TITLE__-->OLD TITLE<!--__END_TITLE__--></title> SUFFIX"
+        "<title>OLD TITLE</title> SUFFIX"
     )
     apps = [{"id": "test", "notes": "Line one.\nLine two."}]
     new_html = inject_data(html, apps, "Your real tracked applications.", "Your Job Pipeline")
@@ -232,8 +239,14 @@ def check_dashboard_injection_survives_embedded_newline():
         print("FAIL: inject_data() did not correctly swap the banner subtitle.")
         return False
 
-    if "Your Job Pipeline" not in new_html or "OLD TITLE" in new_html:
+    if "<title>Your Job Pipeline</title>" not in new_html or "OLD TITLE" in new_html:
         print("FAIL: inject_data() did not correctly swap the page title.")
+        return False
+
+    if "__TITLE__" in new_html:
+        print("FAIL: a <!--__TITLE__--> marker leaked into the output - this renders as literal visible "
+              "text in a browser tab, since <title> is a raw-text element where comment syntax isn't "
+              "parsed as a comment. This exact bug shipped once already (see TESTING.md).")
         return False
 
     print("build_dashboard.py's inject_data() survives an embedded newline and swaps the subtitle and title correctly.")

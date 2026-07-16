@@ -199,10 +199,16 @@ def parse_application(path):
 
 def inject_data(html, apps, subtitle, title):
     """Splice apps (a list of application dicts) into html's /*__DATA__*/.../*__END_DATA__*/
-    markers, and set the banner subtitle and browser-tab title via their own
-    <!--__SUBTITLE__-->/<!--__TITLE__--> marker pairs. Shared by main() and
-    scripts/verify_consistency.py's regression test, so the exact code path that ships is
-    the one that's tested - not a second reimplementation.
+    markers, set the banner subtitle via its own <!--__SUBTITLE__--> marker pair, and set the
+    browser-tab title by replacing <title>...</title> directly - not via a marker pair like
+    the subtitle, because <title> is an HTML "raw text" element: content inside it is never
+    parsed as markup at all, so HTML comment syntax doesn't get hidden the way it does inside
+    a normal element like the subtitle's <div>. A <!--__TITLE__--> marker previously used here
+    rendered as literal visible text in the browser tab on the live public demo - a real,
+    shipped bug, not a hypothetical one. <title> is unique in a valid HTML document, so no
+    marker is needed: matching the tag itself is both simpler and actually correct. Shared by
+    main() and scripts/verify_consistency.py's regression test, so the exact code path that
+    ships is the one that's tested - not a second reimplementation.
 
     subtitle and title are required arguments, not defaults, on purpose: docs/index.html's
     committed text ("Fictional companies... No real job search data", "...example dashboard")
@@ -238,8 +244,8 @@ def inject_data(html, apps, subtitle, title):
         flags=re.DOTALL,
     )
     html = re.sub(
-        r"<!--__TITLE__-->.*?<!--__END_TITLE__-->",
-        lambda m: f"<!--__TITLE__-->{title}<!--__END_TITLE__-->",
+        r"<title>.*?</title>",
+        lambda m: f"<title>{title}</title>",
         html,
         flags=re.DOTALL,
     )

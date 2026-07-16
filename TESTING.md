@@ -1,6 +1,6 @@
 # Testing log
 
-This repo's skill logic was actually executed, not just written and left unverified. Twenty-seven tests, run across sessions between 2026-07-09 and 2026-07-16, documented here as evidence rather than assertion.
+This repo's skill logic was actually executed, not just written and left unverified. Twenty-eight tests, run across sessions between 2026-07-09 and 2026-07-16, documented here as evidence rather than assertion.
 
 **Note on scope:** every test in this log uses fictional company names, even where the underlying test was run against a real job description – the pipeline this repo replaces is the author's real, active job search, and no real employer name or real application detail belongs in a public repo. Where a test needed real-world grounding (a live search actually returning current facts, a scoring run against real market data), the company name and any identifying specifics are fictionalised while the mechanism being tested – live search working, the scoring rubric producing a defensible number – is described honestly.
 
@@ -492,6 +492,18 @@ PASS: all 6 golden-set cases fall within their expected bands.
 `python scripts/verify_consistency.py` also re-run clean, all six checks unaffected by this change.
 
 **What this proves / doesn't prove:** proves the new mechanism reproduces the existing five cases' scores exactly under hand-reasoned re-derivation, and correctly recognises one deliberately-constructed non-obvious-fit case it was built to catch. Doesn't prove it generalizes to every possible non-obvious-fit shape – one new case exercises one failure mode, not the space of all of them. Doesn't prove the recency modifier or career-break guardrail work correctly in practice – no golden-set case exercises either path yet, flagged directly in `eval/golden_set.md` as uncovered rather than silently assumed fine. And this generalizes a real private finding into the public rubric's design – it doesn't itself prove the private finding's own fix works; that's being verified separately, privately, against real outcomes over time.
+
+## Test 28 – Live browser-tab title bug, found via the actual public demo site, not the code
+
+A skeptical full-repo review (checking the shipped, deployed state for real, not just reading source) loaded the live public demo (`ddkeyworth.github.io/ai-job-pipeline-toolkit`) and read the browser tab title directly: it showed `<!--__TITLE__-->Job Pipeline Toolkit – example dashboard<!--__END_TITLE__-->` – the raw marker comments, visible as literal text, not a clean title.
+
+**Root cause:** `<title>` is an HTML "raw text" element – its content is never parsed as markup at all, so `<!--...-->` inside it isn't recognised as a comment the way it is inside a normal element. The `<!--__TITLE__-->`/`<!--__END_TITLE__-->` marker pair (added when the stale-title bug was first fixed, copying the subtitle's working pattern) rendered as literal visible text instead of being hidden, because the subtitle's pattern only works inside its `<div>` – the exact same marker mechanism is correct in one location and broken in the other, for a reason that isn't obvious without knowing this specific HTML raw-text-element rule.
+
+**Fixed by removing the marker mechanism for the title entirely, not patching around it:** `<title>` is unique in a valid HTML document, so `inject_data()` now matches `<title>...</title>` directly and replaces the whole tag's content – no marker needed at all. `docs/index.html`'s committed `<title>` tag and `scripts/verify_consistency.py`'s test fixture were both updated to match, and the check now asserts the string `__TITLE__` never appears anywhere in the output – a regression guard against this exact bug class recurring, not just a fix for this one instance.
+
+**Also found and fixed in the same pass, unrelated:** `eval/README.md` and `eval/golden_set.md` were both missed by an earlier repo-wide em-dash-to-en-dash sweep (a maintenance pass, not itself logged here as a numbered test) – 45 em-dashes between the two files, silently reintroducing the inconsistency the sweep was meant to close everywhere. Fixed the same way: replaced throughout, verified zero em-dash code points remain anywhere in the tracked repo.
+
+Ran the full verification suite clean after both fixes: `verify_consistency.py` (including the new marker-leak assertion), `verify_eval_results.py`. Confirmed the actual public site reflects the fix after pushing – the whole point of finding this bug was that reading the code alone wouldn't have caught it; a value that looked correct in `docs/index.html`'s prior committed text (the title *content* was right, just wrapped in markers that don't hide) required checking the deployed, rendered output to notice.
 
 ## How to reproduce this
 
