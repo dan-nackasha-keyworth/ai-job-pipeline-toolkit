@@ -1,6 +1,6 @@
 # Testing log
 
-This repo's skill logic was actually executed, not just written and left unverified. Thirty-four tests, run across sessions between 2026-07-09 and 2026-07-20, documented here as evidence rather than assertion.
+This repo's skill logic was actually executed, not just written and left unverified. Thirty-five tests, run across sessions between 2026-07-09 and 2026-07-20, documented here as evidence rather than assertion.
 
 **Note on scope:** every test in this log uses fictional company names, even where the underlying test was run against a real job description – the pipeline this repo replaces is the author's real, active job search, and no real employer name or real application detail belongs in a public repo. Where a test needed real-world grounding (a live search actually returning current facts, a scoring run against real market data), the company name and any identifying specifics are fictionalised while the mechanism being tested – live search working, the scoring rubric producing a defensible number – is described honestly.
 
@@ -578,6 +578,14 @@ Directly prompted by Test 33's finding: since both a local outputs-folder copy a
 Ran the extended `verify_consistency.py` check: confirms no link renders when `cross_link_path` is omitted, and confirms a correct `file://` URI is built from a plain path when one is given – computed dynamically per-OS in the test itself (Windows locally, Ubuntu in CI), rather than hardcoding one platform's path format, after an initial version of the test failed exactly that way on this Windows dev machine.
 
 **What this proves / doesn't prove:** proves the cross-link mechanism works as designed for the outputs-copy → pinned-Artifact direction, confirmed live. Doesn't prove the reverse direction is fixable – the sandbox restriction blocking outbound navigation from inside a pinned Artifact's own view is a platform behaviour, not something this skill's code can change; the fallback (visible path text) is a deliberate accommodation of that limit, not a bug left unfixed.
+
+## Test 35 – A Project and a local folder can be connected to the same Cowork chat at once
+
+Asked directly, before deleting the Test 1 chat: could this same session also connect a local folder, in addition to the Project it was already reading from, so source material (CV, JDs, cover letters) stays in the Project while the tracked pipeline (`applications/`, `companies/`, the dashboard) writes to a local folder instead? **Confirmed yes** – a Project and a local folder are independent attachments in Cowork, not mutually exclusive data sources, and both can be connected to one chat simultaneously.
+
+This resolves a real, previously-unanswered design question: Test 1 (Project-only) and Test 2 (local-folder-only) were run as if those were the only two options, but a combined setup – Project for organisation, local folder as the actual write target – was never tested because it was never known to be possible. `README.md` updated to recommend it directly, since it keeps the benefits of both: a Project's own file organisation for source material, and a local folder's genuine write access for the data that actually needs to persist.
+
+**Not yet exercised end-to-end** – confirmed as a valid configuration, not yet run through an actual score-and-track cycle with both connected at once. That's a natural next check, not required before this finding is documented, since the configuration question and the "does it work in practice" question are separable.
 
 ## How to reproduce this
 
