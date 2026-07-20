@@ -2,11 +2,11 @@
 
 Known gaps to revisit.
 
-## Cowork does not reliably offer to pin the Artifact on its own, despite `SKILL.md` instructing it to
+## Cowork's automatic pin-offer is unreliable without an explicit ask – the explicit-ask pattern is now verified working end-to-end
 
-Confirmed live, three separate times, across three different attempts at strengthening the instruction (prominence, restructuring into a standalone step, task-list framing): a Cowork session can score a JD and build the dashboard file correctly, then simply end its turn without ever raising the Artifacts library at all, even though `SKILL.md` instructs offering to pin it as a required part of that step. Each time, asking directly ("why didn't you create an artifact?") worked immediately and correctly. This looks like a genuine behavioural tendency – satisfying the literal request over proactively volunteering a separate action – that prompt engineering within `SKILL.md` has not reliably overridden so far.
+Confirmed live, three separate times, across three different attempts at strengthening the instruction (prominence, restructuring into a standalone step, task-list framing): a Cowork session can score a JD and build the dashboard file correctly, then simply end its turn without ever raising the Artifacts library at all, even though `SKILL.md` instructs offering to pin it as a required part of that step. This looks like a genuine behavioural tendency – satisfying the literal request over proactively volunteering a separate action – that prompt engineering within `SKILL.md` has not reliably overridden on its own.
 
-**Mitigated, not solved:** rather than continuing to chase automatic behaviour, `README.md` now recommends the user ask for the pinned Artifact explicitly in their first message of any new Cowork chat. This works reliably when tried. `SKILL.md`'s own instruction to offer proactively is left in place as a best-effort – it may still work sometimes – but is no longer the thing anything depends on.
+**Mitigated, and the mitigation is now verified, not just recommended:** `README.md` tells the user to ask for the pinned Artifact explicitly in their first message of any new Cowork chat, rather than relying on the skill to offer it unprompted. Run for real with this pattern (see Test 32 in `TESTING.md`): a genuine pinned Artifact, tagged Cowork, confirmed directly in the real Artifacts library gallery – not a local file, not the chat's own claim taken on trust. `SKILL.md`'s own instruction to offer proactively stays in place as a best-effort, but the explicit-ask pattern in `README.md` is what the recommended workflow actually depends on, and it works.
 
 ## Resolved: Cowork dashboard persistence and the Project-files-vs-local-folder distinction
 
