@@ -1,6 +1,6 @@
 ---
 name: job-pipeline
-description: Tracks job applications, scores job descriptions for callback likelihood, and maintains a visual pipeline dashboard. Use this skill whenever the user wants to score a job description, log an application, update an application's status or outcome, review their pipeline, or ask for the dashboard to be regenerated. Works entirely on the user's own tracked data – never on data belonging to anyone else.
+description: Tracks job applications, scores job descriptions for callback likelihood, and maintains a visual pipeline dashboard. Use this skill whenever the user wants to score a job description, log an application, update an application's status or outcome, review their pipeline, or produce/update/add to their dashboard, however they phrase it. Works entirely on the user's own tracked data – never on data belonging to anyone else.
 ---
 
 # Job Pipeline Toolkit
