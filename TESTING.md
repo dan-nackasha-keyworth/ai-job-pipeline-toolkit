@@ -1,6 +1,6 @@
 # Testing log
 
-This repo's skill logic was actually executed, not just written and left unverified. Twenty-nine tests, run across sessions between 2026-07-09 and 2026-07-16, documented here as evidence rather than assertion.
+This repo's skill logic was actually executed, not just written and left unverified. Thirty tests, run across sessions between 2026-07-09 and 2026-07-20, documented here as evidence rather than assertion.
 
 **Note on scope:** every test in this log uses fictional company names, even where the underlying test was run against a real job description – the pipeline this repo replaces is the author's real, active job search, and no real employer name or real application detail belongs in a public repo. Where a test needed real-world grounding (a live search actually returning current facts, a scoring run against real market data), the company name and any identifying specifics are fictionalised while the mechanism being tested – live search working, the scoring rubric producing a defensible number – is described honestly.
 
@@ -517,7 +517,17 @@ The long-open question this log has carried since Test 23 – does this skill's 
 1. **This log's own "auto-updating"/"always-current" language was wrong**, repeated across `SKILL.md`'s Platform detection section, `README.md`'s Cowork section, and `ISSUES.md`. Cowork's dashboards are pinned, persisted snapshots – genuinely valuable (no manual Publish click, no download/re-upload round-trip, survives across sessions) – but not self-refreshing without a connector this skill's local-file data doesn't have. Corrected everywhere this claim appeared, not just in one place.
 2. **Publishing/pinning the Artifact is not automatic** – without an explicit ask, the dashboard exists only as a local file, invisible from `claude.ai/artifacts` entirely. Checked directly, deliberately not trusting the chat's own preview: a fresh browser tab at `claude.ai/artifacts`, genuinely showed nothing new. A real new user following the README wouldn't know to ask. `SKILL.md` now instructs offering to pin the dashboard as a standard part of the first regeneration in a Cowork chat, mirroring the confirmation-gate behaviour Cowork itself demonstrated (ask once, proceed once answered) rather than requiring the user to think of the extra step themselves.
 
-**What's still open:** the local-folder variant of Cowork (as opposed to Project-files) hasn't been separately re-run under the corrected understanding – expected to behave identically, since both are backed by local markdown files with no connector either way, but not yet confirmed empirically. The user's real, disposable test Project and its pinned Artifact are still awaiting cleanup at time of writing; not blocking anything documented here.
+**What's still open:** the local-folder variant of Cowork (as opposed to Project-files) hasn't been separately re-run under the corrected understanding – expected to behave identically, since both are backed by local markdown files with no connector either way, but not yet confirmed empirically. The test Project and its pinned Artifact were deleted after this test concluded.
+
+## Test 30 – The Step 5 fix didn't hold on a genuine retest, fixed more forcefully
+
+Immediately re-ran Test 29's setup from scratch to confirm the auto-offer fix actually worked, rather than trusting it after one edit. **It didn't.** A fresh Cowork chat, installed from a newly re-downloaded zip (verified byte-for-byte identical to the committed `SKILL.md`, including the fix – this was not a stale-skill problem), scored a JD and produced the dashboard correctly, then simply ended its turn – no offer to publish, no mention of the Artifacts library at all.
+
+**Real finding, not a setup mistake:** the instruction existed and was current, but a single sentence embedded inside a long paragraph (the Platform detection bullet, cross-referenced from a parenthetical in Step 5's opening paragraph) wasn't forceful enough to survive contact with a real session's own judgement about when the dashboard step was "done." Writing the file and showing it looked complete enough to stop at.
+
+**Fixed by restructuring, not rewording:** moved the instruction out of prose entirely, to a **standalone, numbered, unmissable final action** at the very end of Step 5 – the last thing read before moving on – stating explicitly that writing the local file is not the same as completing this step, and giving two concrete branches (first dashboard in the chat: ask; a pinned Artifact already exists: push to it directly, don't ask again). This mirrors how `Step 2`'s duplicate-check and `Step 1`'s CV-ambiguity handling are structured – a required, sequential action with its own heading, not a note folded into a paragraph about something else.
+
+**Not yet re-verified after this second fix**, honestly stated – the retest that found the gap used the *previous* version of the instruction; this fix is new as of this commit and hasn't itself been run against a fresh Cowork session yet. Flagged here rather than assumed to work just because the reasoning for why it should is stronger.
 
 ## How to reproduce this
 
