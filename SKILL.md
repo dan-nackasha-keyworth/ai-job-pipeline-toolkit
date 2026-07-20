@@ -138,6 +138,8 @@ interviewing -> offer | rejected_after_interview | withdrew_after_interview
 
 ## Step 5: Regenerate the dashboard
 
+**In Cowork, "regenerate the dashboard" means two actions, not one: build the file, and pin/update the Artifact. Neither is optional, and the second is not implied by the first.** If this task is being tracked as a checklist or plan of any kind, put both on it now, at the start – not just "write the dashboard file," which is the incomplete version of this task that has already shipped once. A dashboard that exists only as a local file is not a completed regeneration in Cowork.
+
 Read every application file, build the three-level view (Pipeline → Interview stage → Briefing pack) per the dashboard template, and output/write it. Do this whenever asked, or after logging a new application/outcome if the user seems to be working through their pipeline in one sitting – but don't regenerate proactively on every single small edit if it wasn't asked for; that's unnecessary cost for no benefit. **In a Claude.ai Project (Chat mode, no Cowork), producing the dashboard this way also means telling the user plainly, in the same turn the Artifact is shown, every time, not just once, that it needs an explicit Publish click (by them, not by Claude) to appear in their Artifacts library at all, and that even published it's a static snapshot, pushed forward again only by a fresh manual Publish – see Platform detection above for exactly how this compares to Cowork's pinned-but-also-not-self-refreshing dashboards, and don't describe either one as "auto-updating." Skipping the Chat-mode disclosure leaves the user believing they have a saved, current dashboard when they don't.**
 
 **Call `inject_data()` from `scripts/build_dashboard.py` directly – never hand-splice the `/*__DATA__*/` marker or reimplement the injection logic freehand.** The skill's own scripts are reachable via code execution on both platforms (Cowork has direct local access; on Claude.ai the skill's files are mounted at `/mnt/skills/user/job-pipeline/`, confirmed working – see `scripts/check_duplicate.py`'s usage above). Import it and call it:
@@ -162,6 +164,12 @@ with open("/mnt/skills/user/job-pipeline/docs/index.html", "w") as f:  # local p
 
 **Write the result back this way – one direct, complete write – never through an incremental/patch-based file-editing tool.** A real dashboard is not small: this repo's own 35-example demo is already 100KB+, and a genuine multi-month pipeline will grow well past that. A concrete report from real use: an incremental file-editing tool silently truncated a dashboard file right around 155-158KB, with no error surfaced – the file just ended up shorter than intended, mid-content, until rewritten as a single direct write. Read the whole file, build the whole new string, write the whole thing back in one call, exactly as above.
 
+**Immediately after that write, in Cowork: pin it or push to it. Do not respond to the user describing the dashboard as done until this has happened.**
+1. First dashboard in this chat → ask directly whether to pin it to the Artifacts library, stating plainly in the same message that this makes it a persisted snapshot, not a self-refreshing one (see Platform detection above for why).
+2. A pinned Artifact from this chat already exists → push the update to that same Artifact directly. Don't ask again.
+
+This was skipped once already in real use, with the file written correctly and the turn simply ending there – confirm in your own response that you actually did this, not just that the file was written.
+
 Reusing the real, tested function (rather than reimplementing it inline each time) is what actually prevents three real bugs that have all shipped before:
 
 - **A `re.sub` corruption bug.** A plain-string replacement to `re.sub` reinterprets backslash sequences (it treats them as backreference syntax), silently turning `json.dumps`'s correctly-escaped `\n` inside long fields like `jd_summary`/`caveats` back into literal raw newlines – invalid syntax inside a JS string literal. The failure mode is a fully-rendered header/footer with a completely blank pipeline list and nothing visible to the user beyond a browser-console `SyntaxError`. `inject_data()` already handles this correctly internally – that's exactly why it should be called, not re-derived from memory.
@@ -169,11 +177,6 @@ Reusing the real, tested function (rather than reimplementing it inline each tim
 - **A stale "example dashboard" browser-tab title.** Same root cause as the subtitle, one level less visible – easy to miss even right after fixing the subtitle, which is exactly what happened once already. `title` is required for the same reason: write something accurate (e.g. `"Your Job Pipeline"`), never leave the demo's title in a real user's dashboard.
 
 **Silence check.** As part of regenerating (or whenever asked to review the pipeline), scan `applied` applications for silence past `config/weights.json → pipeline_hygiene.assumed_rejected_after_days`, measured from `status_date`. For each one past the threshold, **propose** marking it `assumed_rejected` – state which application, how long it's been silent, and let the user confirm or dismiss each one. Never set it silently, and never propose it again for an application the user has already dismissed once. `assumed_rejected` is only reachable from `applied`, per the state machine in Step 4 – an `interviewing` application that goes quiet stays `interviewing` until the user reports an actual outcome, not silently reclassified.
-
-**Last action in Cowork, every single time a dashboard is regenerated: explicitly ask whether to pin it to the Artifacts library. This is a required step of the procedure, not optional framing, and not covered by having written the local file.** Confirmed directly against real use: a session can write the dashboard file correctly, show it to the user, and simply end its turn there, without ever raising publishing at all – the instruction existing elsewhere in this document did not stop that from happening. So, before ending the turn in which a dashboard was regenerated in Cowork:
-1. If this is the first dashboard produced in this chat, ask directly whether to pin it to the Artifacts library – state plainly, in the same message, that this makes it a persisted snapshot, not a self-refreshing one (see Platform detection above for why).
-2. If a pinned Artifact from this chat already exists, push the update to that same Artifact directly, without asking again each time.
-3. Writing the local file is not the end of this step. Do not treat it as complete until one of the above has actually happened.
 
 ## Step 6: Pipeline self-review / recalibration agent
 
