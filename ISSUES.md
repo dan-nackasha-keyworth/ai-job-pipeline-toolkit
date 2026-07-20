@@ -2,8 +2,8 @@
 
 Known gaps to revisit.
 
-## Cowork Live Artifact dashboard-persistence claim not yet verified end-to-end
+None currently open.
 
-`SKILL.md`/`README.md` now state that a Cowork-produced dashboard is a Live Artifact – pinnable, saved to the Artifacts library, auto-updating – citing Anthropic's own documentation for the platform feature itself. Not yet confirmed that this skill's own `inject_data()` → Artifact flow, run inside a genuinely fresh Cowork session, actually produces a Live Artifact rather than a plain one. Claude Code cannot test this directly – Cowork is desktop-app-only, and computer-use tooling is explicitly blocked from controlling Claude's own application. Needs a human-driven Cowork session (see the planned Cowork blind test in `TESTING.md`) with results reported back.
+## Resolved: Cowork dashboard persistence, corrected from an overstated claim
 
-Separately, confirmed and already documented: a Chat-mode dashboard Artifact *can* be manually published (one click, by the user) to appear in the Artifacts library and get a shareable URL, but it's a static snapshot, not a Live Artifact – it doesn't auto-update and isn't pinnable. This was verified directly.
+Previously flagged here as unverified: whether a Cowork-produced dashboard actually becomes a persistent, pinned Artifact. Now confirmed via a real human-driven Cowork session (see `TESTING.md`), with one correction to what was previously assumed: Cowork's dashboards *can* be pinned to the Artifacts library and persist across sessions, but they are **not** self-refreshing "Live Artifacts" in the sense Anthropic's connector-backed Artifacts (Slack, Gmail, calendar) are – genuine auto-refresh requires a connector called live from the browser, and this skill's data is local markdown files with no connector behind it. In practice: a pinned, persisted snapshot, pushed forward each time the dashboard is regenerated – not something that updates itself unprompted. `SKILL.md` and `README.md` have been corrected to describe this precisely rather than as "auto-updating" or "always-current," and `SKILL.md` now instructs offering to pin the dashboard as a standard part of the first regeneration in a Cowork chat, rather than requiring the user to think to ask for it separately (confirmed live: without that offer, nothing gets pinned at all).

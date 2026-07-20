@@ -9,7 +9,7 @@ An open-source job-application tracker and JD-fit scorer, built as a Claude skil
   <img src="docs/assets/dashboard-briefing-pack.png" alt="An expanded application card showing its score breakdown and full interview briefing pack" width="49%">
 </p>
 
-**This dashboard only stays live and current with Cowork.** A Claude.ai Project alone can score and log applications, but nothing about it functions as an ongoing tracker – see "Getting started" below.
+**This dashboard only persists and stays current with Cowork.** A Claude.ai Project alone can score and log applications, but nothing about it functions as an ongoing tracker – see "Getting started" below.
 
 The example above is entirely synthetic – fictional companies, fictional applications, generated to show what the tool produces. See "Getting started" to point it at your own data.
 
@@ -59,12 +59,12 @@ Every status is reached from exactly one place – no other transitions exist. T
 None of this is enforced by the skill – it's a suggestion based on what tends to cause friction, not a required structure.
 
 ### Claude Cowork – the tracker (recommended)
-Cowork's dashboards are **Live Artifacts** – Anthropic's own persistent, pinnable, auto-updating dashboard mechanism, saved to your Artifacts library independent of any one chat. This is what makes the screenshots above true over time: a dashboard that stays current for as long as your search runs, not something you manually rebuild and republish every time something changes.
+Cowork can pin your dashboard to your Artifacts library as a persisted page, saved independent of any one chat – it'll offer to do this the first time it produces one. **One precision worth having, confirmed directly:** Anthropic's Live Artifacts genuinely auto-refresh when they're backed by a connector (Slack, Gmail, a calendar) called live from the browser. Your job-pipeline data is local markdown files with no connector behind it, so this dashboard doesn't self-refresh that way – it's a snapshot that gets pushed forward each time you ask Claude to regenerate it. What you still get, and what actually matters day to day: it persists across sessions, doesn't need a manual Publish click, and updating it never needs a download/re-upload round-trip – the real gap with the Claude.ai Project path below.
 
 1. Create a Claude.ai Project first, and start your Cowork chat inside it – rather than a loose Cowork chat with no Project at all. Cowork itself doesn't require this, but it keeps the chat history, memory, and files scoped together the same way a real ongoing tracker needs to be.
 2. When starting the chat, point Cowork at your data – Cowork's own start-of-chat setup lets you choose either your Project's own files or a local folder. Either way: your CV, and an `applications/` and `companies/` subfolder following `schema/SCHEMA.md`.
 3. Install `SKILL.md` the same way you'd install any Cowork skill, from the same source – Cowork already has direct access to the rest of the repo (`schema/`, `config/`) alongside it, so there's no separate bundling step like the Claude.ai Project path below needs.
-4. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes your data directly, so there's no separate upload step, and no download/re-upload step for every subsequent update either. **Dashboards produced this way are Live Artifacts** – pinnable and current.
+4. Ask Claude to score a JD, log an application, or regenerate the dashboard – it reads and writes your data directly, so there's no separate upload step, and no download/re-upload step for every subsequent update either. The first time it produces a dashboard, it'll offer to pin it to your Artifacts library – confirm once, and every later regeneration pushes to that same pinned page.
 
 **Only run one Cowork chat against your data at a time.** Each Cowork chat works from its own snapshot taken when that chat started – a second chat (even in the same Project) pointed at the same data can't see edits the first one makes, and vice versa. Whichever one saves last silently overwrites the other's changes, with no merge and no warning – the same underlying cause as the skill-update behaviour described below (a chat keeps using whatever it loaded when it started), just applied to your actual data instead of just the skill file. Stick to a single active Cowork chat per Project; close one before starting another against the same data.
 
